@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Copart: The Scale Advantage</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #07101f;
+      --card: #0d1b30;
+      --card2: #111d33;
+      --border: #1a2e4a;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --copart: #0047bb;
+      --copart-light: rgba(0, 71, 187, 0.15);
+      --gold: #f59e0b;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      position: relative;
+      background: linear-gradient(135deg, #03091a 0%, #0a1933 50%, #071428 100%);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      padding: 72px 40px 60px;
+      text-align: center;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 800px 400px at 50% 0%, rgba(0,71,187,0.2) 0%, transparent 70%),
+        radial-gradient(ellipse 400px 300px at 20% 80%, rgba(0,200,255,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .header-tag {
+      display: inline-block;
+      background: var(--copart-light);
+      border: 1px solid rgba(0,71,187,0.5);
+      color: #60a5fa;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 5px 16px;
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    h1 span { color: #3b82f6; }
+    header p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 620px;
+      margin: 0 auto 48px;
+      line-height: 1.6;
+    }
+
+    /* ─── HERO STATS ─── */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .hero-stat {
+      background: rgba(0,71,187,0.12);
+      border: 1px solid rgba(0,71,187,0.35);
+      border-radius: 14px;
+      padding: 20px 16px;
+      backdrop-filter: blur(8px);
+    }
+    .hero-stat-value {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+    .hero-stat-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #60a5fa;
+      margin-top: 6px;
+    }
+
+    /* ─── LEGEND ─── */
+    .legend-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 20px;
+      justify-content: center;
+      padding: 28px 40px;
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .legend-item.copart-legend { color: #fff; font-weight: 700; }
+
+    /* ─── MAIN GRID ─── */
+    main { padding: 40px; max-width: 1400px; margin: 0 auto; }
+
+    .section-header {
+      margin-bottom: 32px;
+      margin-top: 40px;
+    }
+    .section-header:first-child { margin-top: 0; }
+    .section-header h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+    .section-header p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .charts-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      position: relative;
+      transition: border-color 0.2s;
+      overflow: hidden;
+    }
+    .chart-card:hover { border-color: rgba(0,71,187,0.4); }
+    .chart-card.featured {
+      border-color: rgba(0,71,187,0.5);
+      background: var(--card2);
+    }
+    .chart-card.featured::before {
+      content: '★ COPART LEADS';
+      position: absolute;
+      top: 14px; right: 16px;
+      font-size: 9px; font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.3);
+      padding: 3px 8px;
+      border-radius: 100px;
+    }
+
+    .chart-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 4px;
+    }
+    .chart-subtitle {
+      font-size: 0.73rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    /* chart-wrap needs explicit height for Chart.js maintainAspectRatio:false */
+    .chart-wrap { position: relative; height: 270px; width: 100%; }
+    .charts-grid.three .chart-wrap { height: 230px; }
+
+    /* ─── RADAR SECTION ─── */
+    .radar-section {
+      background: var(--card);
+      border: 1px solid rgba(0,71,187,0.4);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .radar-section h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .radar-section p { font-size: 0.85rem; color: var(--muted); margin-bottom: 32px; }
+    .radar-wrap { max-width: 680px; margin: 0 auto; }
+    .radar-wrap .chart-wrap { height: 560px; }
+
+    /* ─── DOMINANCE CARDS ─── */
+    .dominance-section {
+      background: linear-gradient(135deg, #03091a, #071428);
+      border: 1px solid rgba(0,71,187,0.5);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 24px;
+    }
+    .dominance-section h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .dominance-section > p { font-size: 0.85rem; color: var(--muted); margin-bottom: 28px; }
+    .dominance-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+    .dominance-card {
+      background: rgba(0,71,187,0.1);
+      border: 1px solid rgba(0,71,187,0.25);
+      border-radius: 14px;
+      padding: 20px 16px;
+      text-align: center;
+    }
+    .dominance-rank { font-size: 2.2rem; font-weight: 900; color: var(--gold); letter-spacing: -1px; }
+    .dominance-metric { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #60a5fa; margin: 4px 0; }
+    .dominance-value { font-size: 1.1rem; font-weight: 800; color: #fff; }
+    .dominance-context { font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      line-height: 1.7;
+    }
+    footer strong { color: #94a3b8; }
+
+    @media (max-width: 900px) {
+      .charts-grid, .charts-grid.three { grid-template-columns: 1fr; }
+      .hero-stats { grid-template-columns: repeat(2, 1fr); }
+      .dominance-grid { grid-template-columns: repeat(2, 1fr); }
+      header { padding: 48px 24px 40px; }
+      main { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════ HEADER ══════════════════ -->
+<header>
+  <div class="header-tag">Competitive Intelligence Report · 2024</div>
+  <h1>Copart vs. <span>The Competition</span></h1>
+  <p>A comprehensive analysis of scale, reach, and market position across the auto remarketing landscape.</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-value">$4.2B</div>
+      <div class="hero-stat-label">Annual Revenue</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-value">11</div>
+      <div class="hero-stat-label">Countries</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-value">250+</div>
+      <div class="hero-stat-label">Locations</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-value">750K+</div>
+      <div class="hero-stat-label">Registered Buyers</div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════ LEGEND ══════════════════ -->
+<div class="legend-bar">
+  <div class="legend-item copart-legend"><div class="legend-dot" style="background:#0047bb"></div>Copart</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#e11d48"></div>IAA (RB Global)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div>Manheim</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>OpenLane</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>ACV Auctions</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ec4899"></div>CarMax</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div>Carvana</div>
+</div>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<main>
+
+  <!-- 01: FINANCIAL & MARKET SCALE -->
+  <div class="section-header">
+    <h2>01 — Financial &amp; Market Scale</h2>
+    <p>Revenue and investor-assigned market value across the competitive set.</p>
+  </div>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Annual Revenue</div>
+      <div class="chart-subtitle">Most recent fiscal year, USD billions. CarMax &amp; Carvana include retail vehicle sales.</div>
+      <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
+    </div>
+    <div class="chart-card featured">
+      <div class="chart-title">Market Capitalization</div>
+      <div class="chart-subtitle">Public market value, USD billions. Manheim (Cox Automotive) is private — bar not shown.</div>
+      <div class="chart-wrap"><canvas id="mktCapChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 02: PHYSICAL FOOTPRINT -->
+  <div class="section-header">
+    <h2>02 — Physical Footprint</h2>
+    <p>Locations, land ownership, and global reach define operational capacity and barrier to entry.</p>
+  </div>
+  <div class="charts-grid three">
+    <div class="chart-card featured">
+      <div class="chart-title">Physical Locations</div>
+      <div class="chart-subtitle">Auction yards, storage lots &amp; reconditioning sites worldwide.</div>
+      <div class="chart-wrap"><canvas id="locationsChart"></canvas></div>
+    </div>
+    <div class="chart-card featured">
+      <div class="chart-title">Land Footprint</div>
+      <div class="chart-subtitle">Total owned &amp; operated acreage (thousands of acres). ACV &amp; Carvana are digital-first.</div>
+      <div class="chart-wrap"><canvas id="acreageChart"></canvas></div>
+    </div>
+    <div class="chart-card featured">
+      <div class="chart-title">Countries of Operation</div>
+      <div class="chart-subtitle">Unique countries with active Copart operations vs. competitors.</div>
+      <div class="chart-wrap"><canvas id="countriesChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 03: OPERATIONAL VOLUME -->
+  <div class="section-header">
+    <h2>03 — Operational Volume &amp; Workforce</h2>
+    <p>Core throughput metrics and the people powering each business.</p>
+  </div>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Vehicles Processed Annually</div>
+      <div class="chart-subtitle">Millions of units sold/processed per year. Manheim includes broad wholesale volume.</div>
+      <div class="chart-wrap"><canvas id="vehiclesChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Total Employees</div>
+      <div class="chart-subtitle">Full-time equivalent headcount (thousands). Manheim is part of Cox Automotive.</div>
+      <div class="chart-wrap"><canvas id="employeesChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 04: TECH, CULTURE, LONGEVITY -->
+  <div class="section-header">
+    <h2>04 — Technology, Culture &amp; Longevity</h2>
+    <p>Platform quality, employee satisfaction, and depth of industry experience.</p>
+  </div>
+  <div class="charts-grid three">
+    <div class="chart-card featured">
+      <div class="chart-title">Mobile App Rating</div>
+      <div class="chart-subtitle">iOS App Store rating — a proxy for platform investment &amp; user experience. Out of 5.0.</div>
+      <div class="chart-wrap"><canvas id="appChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Glassdoor Employee Rating</div>
+      <div class="chart-subtitle">Aggregate employee satisfaction. Higher = stronger culture &amp; retention. Out of 5.0.</div>
+      <div class="chart-wrap"><canvas id="glassdoorChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Years in Operation</div>
+      <div class="chart-subtitle">Years of continuous industry experience as of 2024. Manheim est. 1945; Copart est. 1982.</div>
+      <div class="chart-wrap"><canvas id="yearsChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 05: BUYER NETWORK -->
+  <div class="section-header">
+    <h2>05 — Buyer Network &amp; Inventory Depth</h2>
+    <p>For sellers, more competing buyers from more countries means higher returns. This is Copart's decisive edge.</p>
+  </div>
+  <div class="charts-grid three">
+    <div class="chart-card featured">
+      <div class="chart-title">Registered Global Buyers</div>
+      <div class="chart-subtitle">Total registered buyer/member accounts (thousands). CarMax &amp; Carvana are B2C retail — not applicable.</div>
+      <div class="chart-wrap"><canvas id="buyersChart"></canvas></div>
+    </div>
+    <div class="chart-card featured">
+      <div class="chart-title">Buyer Nations</div>
+      <div class="chart-subtitle">Countries from which active buyers place bids. Copart's global demand drives competitive bidding.</div>
+      <div class="chart-wrap"><canvas id="buyerNationsChart"></canvas></div>
+    </div>
+    <div class="chart-card featured">
+      <div class="chart-title">Average Daily Inventory</div>
+      <div class="chart-subtitle">Estimated vehicles available for bidding/purchase on any given day (thousands).</div>
+      <div class="chart-wrap"><canvas id="inventoryChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- RADAR -->
+  <div class="radar-section">
+    <h2>Overall Competitive Profile</h2>
+    <p>Normalized scores (0–10) across 11 key dimensions. Each axis: 10 = best-in-class performer.</p>
+    <div class="radar-wrap"><div class="chart-wrap"><canvas id="radarChart"></canvas></div></div>
+  </div>
+
+  <!-- DOMINANCE CARDS -->
+  <div class="dominance-section">
+    <h2>Where Copart Leads</h2>
+    <p>The metrics where Copart holds a clear #1 position across the entire competitive set.</p>
+    <div class="dominance-grid">
+      <div class="dominance-card">
+        <div class="dominance-rank">#1</div>
+        <div class="dominance-metric">Global Reach</div>
+        <div class="dominance-value">11 Countries</div>
+        <div class="dominance-context">Nearest rival: Manheim at 4</div>
+      </div>
+      <div class="dominance-card">
+        <div class="dominance-rank">#1</div>
+        <div class="dominance-metric">Land Footprint</div>
+        <div class="dominance-value">120,000+ Acres</div>
+        <div class="dominance-context">4× more than IAA (30K acres)</div>
+      </div>
+      <div class="dominance-card">
+        <div class="dominance-rank">#1</div>
+        <div class="dominance-metric">Market Cap (Salvage)</div>
+        <div class="dominance-value">~$47 Billion</div>
+        <div class="dominance-context">Largest public auto auction co.</div>
+      </div>
+      <div class="dominance-card">
+        <div class="dominance-rank">#1</div>
+        <div class="dominance-metric">Registered Buyers</div>
+        <div class="dominance-value">750,000+</div>
+        <div class="dominance-context">From 170+ countries worldwide</div>
+      </div>
+      <div class="dominance-card">
+        <div class="dominance-rank">#1</div>
+        <div class="dominance-metric">Buyer Nations</div>
+        <div class="dominance-value">170+ Countries</div>
+        <div class="dominance-context">IAA next at ~40 countries</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer>
+  <strong>Data Sources &amp; Methodology:</strong> Revenue from public SEC filings and investor reports (FY2024). Market cap as of mid-2024. Manheim &amp; Cox Automotive figures are estimates from industry reports (private company). IAA figures pre/post RB Global merger (2023). Acreage based on Copart annual reports and industry estimates for peers. Vehicles processed are annual estimates combining wholesale, salvage, and retail units. Registered buyers from Copart investor reports and industry estimates for peers. Buyer nations from Copart public disclosures; peer estimates based on platform reach. Daily inventory estimated from auction volume data. Employee counts from LinkedIn and public disclosures. App ratings from iOS App Store as of 2024. Glassdoor ratings as listed publicly. Years of operation based on company founding dates. Some figures are approximations — intended for directional comparison only. Not investment advice.
+</footer>
+
+<script>
+  // ─── SETUP ───
+  Chart.register(ChartDataLabels);
+
+  const COMPANIES = ['Copart', 'IAA', 'Manheim', 'OpenLane', 'ACV', 'CarMax', 'Carvana'];
+  const BG = [
+    'rgba(0,71,187,0.85)',
+    'rgba(225,29,72,0.75)',
+    'rgba(249,115,22,0.75)',
+    'rgba(139,92,246,0.75)',
+    'rgba(16,185,129,0.75)',
+    'rgba(236,72,153,0.75)',
+    'rgba(6,182,212,0.75)',
+  ];
+  const BORDER = ['#0047bb','#e11d48','#f97316','#8b5cf6','#10b981','#ec4899','#06b6d4'];
+
+  Chart.defaults.color = '#64748b';
+  Chart.defaults.borderColor = '#1a2e4a';
+  Chart.defaults.font.family = 'Inter';
+
+  // Shared axis style
+  const axisStyle = {
+    grid: { color: 'rgba(26,46,74,0.6)' },
+    ticks: { color: '#64748b', font: { size: 10 } },
+    border: { color: '#1a2e4a' },
+  };
+
+  // Build a bar chart config
+  const barConfig = (data, tooltipUnit, yAxisLabel, dlFormatter, yExtra = {}) => ({
+    type: 'bar',
+    data: {
+      labels: COMPANIES,
+      datasets: [{
+        data,
+        backgroundColor: BG,
+        borderColor: BORDER,
+        borderWidth: 2,
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { top: 28, right: 8 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0d1b30',
+          borderColor: '#1a2e4a',
+          borderWidth: 1,
+          titleColor: '#e2e8f0',
+          bodyColor: '#94a3b8',
+          padding: 12,
+          callbacks: { label: ctx => ctx.parsed.y == null ? ' N/A' : ` ${ctx.parsed.y} ${tooltipUnit}` }
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          color: '#94a3b8',
+          font: { size: 9, weight: '700' },
+          padding: { bottom: 4 },
+          formatter: dlFormatter,
+          clip: false,
+        }
+      },
+      scales: {
+        x: { ...axisStyle },
+        y: {
+          ...axisStyle,
+          ...yExtra,
+          title: {
+            display: true,
+            text: yAxisLabel,
+            color: '#475569',
+            font: { size: 10, weight: '500' },
+            padding: { bottom: 8 },
+          }
+        }
+      },
+      animation: { duration: 900, easing: 'easeOutQuart' }
+    }
+  });
+
+  // Helper to create a bar chart
+  const mkBar = (id, data, tooltipUnit, yAxisLabel, dlFormatter, yExtra = {}) =>
+    new Chart(document.getElementById(id), barConfig(data, tooltipUnit, yAxisLabel, dlFormatter, yExtra));
+
+  // ─── 01: FINANCIAL ───
+  mkBar('revenueChart',
+    [4.19, 4.15, 4.50, 0.89, 0.57, 26.50, 10.77],
+    '$B', 'Revenue (USD Billions)',
+    v => v == null ? '' : `$${v}B`
+  );
+
+  mkBar('mktCapChart',
+    [47, 6, null, 0.8, 1.0, 13, 26],
+    '$B', 'Market Cap (USD Billions)',
+    v => v == null ? '' : `$${v}B`
+  );
+
+  // ─── 02: FOOTPRINT ───
+  mkBar('locationsChart',
+    [250, 200, 75, 35, 0, 245, 33],
+    'sites', 'Number of Locations',
+    v => v == null ? '' : `${v}`
+  );
+
+  mkBar('acreageChart',
+    [120, 30, 14, 4, 0, 5, 1],
+    'K acres', 'Land (Thousands of Acres)',
+    v => v == null ? '' : `${v}K`
+  );
+
+  // Countries as a bar chart (more readable than doughnut for labeled comparison)
+  mkBar('countriesChart',
+    [11, 2, 4, 3, 2, 1, 1],
+    'countries', 'Countries of Operation',
+    v => v == null ? '' : `${v}`
+  );
+
+  // ─── 03: OPERATIONAL ───
+  mkBar('vehiclesChart',
+    [3.2, 2.1, 9.0, 1.2, 0.5, 1.0, 0.45],
+    'M units', 'Vehicles Processed (Millions / Year)',
+    v => v == null ? '' : `${v}M`
+  );
+
+  mkBar('employeesChart',
+    [14, 5.5, 20, 2.4, 1.8, 30, 14],
+    'K people', 'Employees (Thousands)',
+    v => v == null ? '' : `${v}K`
+  );
+
+  // ─── 04: TECH & CULTURE ───
+  mkBar('appChart',
+    [4.8, 4.2, 3.9, 3.6, 4.5, 4.7, 4.8],
+    '/ 5.0', 'App Store Rating (out of 5.0)',
+    v => v == null ? '' : v.toFixed(1),
+    { min: 3.0, max: 5.2 }
+  );
+
+  mkBar('glassdoorChart',
+    [3.8, 3.3, 3.7, 3.5, 3.9, 3.9, 3.5],
+    '/ 5.0', 'Glassdoor Rating (out of 5.0)',
+    v => v == null ? '' : v.toFixed(1),
+    { min: 2.5, max: 4.6 }
+  );
+
+  mkBar('yearsChart',
+    [42, 40, 79, 35, 10, 31, 12],
+    'years', 'Years in Operation',
+    v => v == null ? '' : `${v}yr`
+  );
+
+  // ─── 05: BUYER NETWORK ───
+  mkBar('buyersChart',
+    [750, 500, 70, 80, 22, null, null],
+    'K members', 'Registered Buyers (Thousands)',
+    v => v == null ? 'N/A' : `${v}K`
+  );
+
+  mkBar('buyerNationsChart',
+    [170, 40, 25, 20, 3, 1, 1],
+    'countries', 'Countries with Active Buyers',
+    v => v == null ? '' : `${v}`
+  );
+
+  mkBar('inventoryChart',
+    [175, 120, 80, 50, 15, 50, 35],
+    'K vehicles', 'Daily Inventory (Thousands)',
+    v => v == null ? '' : `${v}K`
+  );
+
+  // ─── RADAR ───
+  const norm = arr => {
+    const mx = Math.max(...arr.filter(v => v != null));
+    return arr.map(v => v == null ? 0 : parseFloat((v / mx * 10).toFixed(1)));
+  };
+
+  const radarData = {
+    'Mkt Cap':          norm([48,  7,    0,    0.8,  1.2,  12,   35  ]),
+    'Locations':        norm([250, 200,  75,   35,   0,    245,  33  ]),
+    'Land Acreage':     norm([120, 30,   14,   4,    0,    5,    1   ]),
+    'Countries':        norm([11,  2,    4,    3,    2,    1,    1   ]),
+    'Vehicles / Yr':    norm([3.2, 2.1,  9.0,  1.2,  0.5,  1.0,  0.45]),
+    'App Rating':       norm([4.8, 4.2,  3.9,  3.6,  4.5,  4.7,  4.8 ]),
+    'Glassdoor':        norm([3.8, 3.3,  3.7,  3.5,  3.9,  3.9,  3.5 ]),
+    'Yrs in Op':        norm([42,  40,   79,   35,   10,   31,   12  ]),
+    'Reg Buyers':       norm([750, 500,  70,   80,   22,   0,    0   ]),
+    'Buyer Nations':    norm([170, 40,   25,   20,   3,    1,    1   ]),
+    'Daily Inventory':  norm([175, 120,  80,   50,   15,   50,   35  ]),
+  };
+
+  new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels: Object.keys(radarData),
+      datasets: COMPANIES.map((name, i) => ({
+        label: name,
+        data: Object.values(radarData).map(m => m[i]),
+        backgroundColor: i === 0 ? 'rgba(0,71,187,0.22)' : BG[i].replace('0.85','0.04').replace('0.75','0.04'),
+        borderColor: BORDER[i],
+        borderWidth: i === 0 ? 3 : 1.5,
+        pointBackgroundColor: BORDER[i],
+        pointRadius: i === 0 ? 5 : 3,
+        pointHoverRadius: 7,
+      }))
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#64748b', font: { size: 11 }, padding: 16, boxWidth: 12, boxHeight: 12 }
+        },
+        tooltip: {
+          backgroundColor: '#0d1b30',
+          borderColor: '#1a2e4a',
+          borderWidth: 1,
+          titleColor: '#e2e8f0',
+          bodyColor: '#94a3b8',
+        },
+        datalabels: { display: false }
+      },
+      scales: {
+        r: {
+          min: 0, max: 10,
+          grid: { color: 'rgba(26,46,74,0.7)' },
+          angleLines: { color: 'rgba(26,46,74,0.7)' },
+          pointLabels: { color: '#94a3b8', font: { size: 10.5, weight: '600' } },
+          ticks: { display: false, stepSize: 2 },
+        }
+      },
+      animation: { duration: 1000 }
+    }
+  });
+</script>
+</body>
+</html>

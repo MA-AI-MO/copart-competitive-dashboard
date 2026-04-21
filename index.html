@@ -283,7 +283,7 @@
 
 <!-- ══════════════════ HEADER ══════════════════ -->
 <header>
-  <div class="header-tag">Competitive Intelligence Report · 2024</div>
+  <div class="header-tag">Competitive Intelligence Report · FY2024–25</div>
   <h1>Copart vs. <span>The Competition</span></h1>
   <p>A comprehensive analysis of scale, reach, and market position across the auto remarketing landscape.</p>
   <div class="hero-stats">
@@ -296,7 +296,7 @@
       <div class="hero-stat-label">Countries</div>
     </div>
     <div class="hero-stat">
-      <div class="hero-stat-value">250+</div>
+      <div class="hero-stat-value">260+</div>
       <div class="hero-stat-label">Locations</div>
     </div>
     <div class="hero-stat">
@@ -452,7 +452,7 @@
       <div class="dominance-card">
         <div class="dominance-rank">#1</div>
         <div class="dominance-metric">Market Cap (Salvage)</div>
-        <div class="dominance-value">~$47 Billion</div>
+        <div class="dominance-value">~$54 Billion</div>
         <div class="dominance-context">Largest public auto auction co.</div>
       </div>
       <div class="dominance-card">
@@ -567,26 +567,26 @@
 
   // ─── 01: FINANCIAL ───
   mkBar('revenueChart',
-    [4.19, 4.15, 4.50, 0.89, 0.57, 26.50, 10.77],
+    [4.19, 4.06, 4.50, 0.91, 0.63, 26.50, 13.70],
     '$B', 'Revenue (USD Billions)',
     v => v == null ? '' : `$${v}B`
   );
 
   mkBar('mktCapChart',
-    [47, 6, null, 0.8, 1.0, 13, 26],
+    [54, 8, null, 1.1, 1.4, 11, 49],
     '$B', 'Market Cap (USD Billions)',
     v => v == null ? '' : `$${v}B`
   );
 
   // ─── 02: FOOTPRINT ───
   mkBar('locationsChart',
-    [250, 200, 75, 35, 0, 245, 33],
+    [260, 200, 75, 30, 0, 246, 33],
     'sites', 'Number of Locations',
     v => v == null ? '' : `${v}`
   );
 
   mkBar('acreageChart',
-    [120, 30, 14, 4, 0, 5, 1],
+    [120, 30, 14, 4, 0, 5, 2],
     'K acres', 'Land (Thousands of Acres)',
     v => v == null ? '' : `${v}K`
   );
@@ -600,41 +600,41 @@
 
   // ─── 03: OPERATIONAL ───
   mkBar('vehiclesChart',
-    [3.2, 2.1, 9.0, 1.2, 0.5, 1.0, 0.45],
+    [3.5, 2.2, 8.5, 1.3, 0.55, 0.9, 0.42],
     'M units', 'Vehicles Processed (Millions / Year)',
     v => v == null ? '' : `${v}M`
   );
 
   mkBar('employeesChart',
-    [14, 5.5, 20, 2.4, 1.8, 30, 14],
+    [15, 7, 20, 2.2, 1.7, 28, 15],
     'K people', 'Employees (Thousands)',
     v => v == null ? '' : `${v}K`
   );
 
   // ─── 04: TECH & CULTURE ───
   mkBar('appChart',
-    [4.8, 4.2, 3.9, 3.6, 4.5, 4.7, 4.8],
+    [4.8, 4.3, 3.9, 3.7, 4.6, 4.8, 4.8],
     '/ 5.0', 'App Store Rating (out of 5.0)',
     v => v == null ? '' : v.toFixed(1),
     { min: 3.0, max: 5.2 }
   );
 
   mkBar('glassdoorChart',
-    [3.8, 3.3, 3.7, 3.5, 3.9, 3.9, 3.5],
+    [3.9, 3.4, 3.7, 3.5, 3.9, 3.9, 3.3],
     '/ 5.0', 'Glassdoor Rating (out of 5.0)',
     v => v == null ? '' : v.toFixed(1),
     { min: 2.5, max: 4.6 }
   );
 
   mkBar('yearsChart',
-    [42, 40, 79, 35, 10, 31, 12],
+    [43, 43, 80, 36, 11, 32, 13],
     'years', 'Years in Operation',
     v => v == null ? '' : `${v}yr`
   );
 
   // ─── 05: BUYER NETWORK ───
   mkBar('buyersChart',
-    [750, 500, 70, 80, 22, null, null],
+    [750, 500, 70, 85, 25, null, null],
     'K members', 'Registered Buyers (Thousands)',
     v => v == null ? 'N/A' : `${v}K`
   );
@@ -646,7 +646,7 @@
   );
 
   mkBar('inventoryChart',
-    [175, 120, 80, 50, 15, 50, 35],
+    [180, 125, 85, 55, 18, 55, 40],
     'K vehicles', 'Daily Inventory (Thousands)',
     v => v == null ? '' : `${v}K`
   );
@@ -658,17 +658,17 @@
   };
 
   const radarData = {
-    'Mkt Cap':          norm([48,  7,    0,    0.8,  1.2,  12,   35  ]),
-    'Locations':        norm([250, 200,  75,   35,   0,    245,  33  ]),
-    'Land Acreage':     norm([120, 30,   14,   4,    0,    5,    1   ]),
+    'Mkt Cap':          norm([54,  8,    0,    1.1,  1.4,  11,   49  ]),
+    'Locations':        norm([260, 200,  75,   30,   0,    246,  33  ]),
+    'Land Acreage':     norm([120, 30,   14,   4,    0,    5,    2   ]),
     'Countries':        norm([11,  2,    4,    3,    2,    1,    1   ]),
-    'Vehicles / Yr':    norm([3.2, 2.1,  9.0,  1.2,  0.5,  1.0,  0.45]),
-    'App Rating':       norm([4.8, 4.2,  3.9,  3.6,  4.5,  4.7,  4.8 ]),
-    'Glassdoor':        norm([3.8, 3.3,  3.7,  3.5,  3.9,  3.9,  3.5 ]),
-    'Yrs in Op':        norm([42,  40,   79,   35,   10,   31,   12  ]),
-    'Reg Buyers':       norm([750, 500,  70,   80,   22,   0,    0   ]),
+    'Vehicles / Yr':    norm([3.5, 2.2,  8.5,  1.3,  0.55, 0.9,  0.42]),
+    'App Rating':       norm([4.8, 4.3,  3.9,  3.7,  4.6,  4.8,  4.8 ]),
+    'Glassdoor':        norm([3.9, 3.4,  3.7,  3.5,  3.9,  3.9,  3.3 ]),
+    'Yrs in Op':        norm([43,  43,   80,   36,   11,   32,   13  ]),
+    'Reg Buyers':       norm([750, 500,  70,   85,   25,   0,    0   ]),
     'Buyer Nations':    norm([170, 40,   25,   20,   3,    1,    1   ]),
-    'Daily Inventory':  norm([175, 120,  80,   50,   15,   50,   35  ]),
+    'Daily Inventory':  norm([180, 125,  85,   55,   18,   55,   40  ]),
   };
 
   new Chart(document.getElementById('radarChart'), {

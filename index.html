@@ -176,11 +176,23 @@
     .max-btn {
       background: none; border: 1px solid transparent; border-radius: 6px;
       color: var(--muted); cursor: pointer; padding: 3px 5px;
-      flex-shrink: 0; margin-left: 8px; line-height: 1;
-      transition: all .15s;
+      flex-shrink: 0; line-height: 1; transition: all .15s;
     }
     .max-btn:hover { color: var(--text); border-color: var(--border); background: rgba(0,71,187,.1); }
     .max-btn svg { width: 11px; height: 11px; display: block; }
+
+    /* ── CHART TYPE TOGGLE ── */
+    .card-hd-right { display: flex; align-items: center; gap: 5px; flex-shrink: 0; margin-left: 8px; margin-top: 1px; }
+    .ct-group { display: flex; gap: 2px; }
+    .ct-btn {
+      background: none; border: 1px solid var(--border); border-radius: 5px;
+      color: var(--muted); cursor: pointer; padding: 3px 5px; line-height: 1;
+      transition: all .15s; font-family: 'Inter', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ct-btn.active { background: rgba(0,71,187,.18); border-color: rgba(0,71,187,.5); color: #60a5fa; }
+    .ct-btn:hover:not(.active) { background: rgba(0,71,187,.09); border-color: rgba(0,71,187,.3); color: #93c5fd; }
+    .ct-btn svg { width: 11px; height: 11px; display: block; }
 
     .cw { position: relative; height: 250px; width: 100%; }
     .g3 .cw { height: 210px; }
@@ -277,7 +289,9 @@
       display: flex; justify-content: space-between; align-items: center;
       flex-shrink: 0;
     }
-    .max-title { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+    .max-hd-text { display: flex; flex-direction: column; gap: 3px; }
+    .max-title { font-size: 1.35rem; font-weight: 700; color: var(--text); }
+    .max-sub   { font-size: 0.88rem; color: var(--muted); line-height: 1.4; }
     .max-body { flex: 1; padding: 24px; position: relative; min-height: 0; }
     .max-cw { position: relative; width: 100%; height: 100%; }
 
@@ -623,7 +637,10 @@
 <div class="max-overlay" id="maxOverlay">
   <div class="max-box">
     <div class="max-hdr">
-      <span class="max-title" id="maxTitle"></span>
+      <div class="max-hd-text">
+        <span class="max-title" id="maxTitle"></span>
+        <span class="max-sub" id="maxSub"></span>
+      </div>
       <button class="modal-close" onclick="closeMax()">&#x2715;</button>
     </div>
     <div class="max-body">
@@ -674,11 +691,12 @@
 
   const isLight = () => document.body.classList.contains('light');
 
-  function axisStyle() {
-    const s = getComputedStyle(document.documentElement);
+  function axisStyle(forMax = false) {
+    // Read from body so body.light overrides are picked up (not just :root vars)
+    const s = getComputedStyle(document.body);
     return {
       grid:   { color: s.getPropertyValue('--axis-grid').trim() },
-      ticks:  { color: s.getPropertyValue('--axis-tick').trim(), font: { size: 9 } },
+      ticks:  { color: s.getPropertyValue('--axis-tick').trim(), font: { size: forMax ? 13 : 9 } },
       border: { color: s.getPropertyValue('--border').trim() },
     };
   }
@@ -689,11 +707,11 @@
   // ── BAR CONFIG BUILDER ──
   // rawData may contain nulls (= N/A). We render a zero-height transparent bar so
   // chartjs-plugin-datalabels has an element to attach the "N/A" label to.
-  function buildBarCfg(labels, rawData, bgColors, bdColors, tooltipUnit, yAxisLabel, dlFmt, yExtra) {
+  function buildBarCfg(labels, rawData, bgColors, bdColors, tooltipUnit, yAxisLabel, dlFmt, yExtra, forMax = false) {
     const light  = isLight();
     const dlCol  = light ? '#475569' : '#94a3b8';
     const tipBg  = light ? '#1e293b' : '#0d1b30';
-    const aStyle = axisStyle();
+    const aStyle = axisStyle(forMax);
     const effMin = yExtra?.min ?? 0;   // place null bar at bottom of visible range
 
     const dispData = rawData.map(v => v == null ? effMin : v);
@@ -731,13 +749,13 @@
           },
           datalabels: {
             anchor: 'end', align: 'top', clip: false,
-            color: dlCol, font: { size: 8.5, weight: '700' }, padding: { bottom: 2 },
+            color: dlCol, font: { size: forMax ? 12 : 8.5, weight: '700' }, padding: { bottom: 2 },
             formatter: (_val, ctx) => dlFmt(ctx.dataset._rawData?.[ctx.dataIndex]),
           }
         },
         scales: {
           x: { ...aStyle },
-          y: { ...aStyle, ...yExtra, title: { display: true, text: yAxisLabel, color: '#475569', font: { size: 9.5, weight: '500' }, padding: { bottom: 6 } } }
+          y: { ...aStyle, ...yExtra, title: { display: true, text: yAxisLabel, color: '#475569', font: { size: forMax ? 13 : 9.5, weight: '500' }, padding: { bottom: 6 } } }
         },
         animation: { duration: 700, easing: 'easeOutQuart' }
       }
@@ -760,7 +778,7 @@
         buildBarCfg(fi2.map(i => CO[i]), fRaw2, fi2.map(i => BG[i]), fi2.map(i => BD[i]), tooltipUnit, yAxisLabel, dlFmt, yExtra)
       );
     };
-    CR[id] = { chart, label: yAxisLabel, allData: rawData, recreate, yExtra };
+    CR[id] = { chart, label: yAxisLabel, allData: rawData, recreate, yExtra, tooltipUnit, dlFmt, currentType: 'bar' };
     return chart;
   }
 
@@ -854,6 +872,150 @@
     'K mentions/mo', 'B2B Auction Mentions (Thousands)', v => v == null ? 'N/A' : `${v}K`);
 
 
+  // ══ HORIZONTAL BAR CONFIG ══
+  function buildHBarCfg(labels, rawData, bgColors, bdColors, tooltipUnit, xAxisLabel, dlFmt, xExtra = {}, forMax = false) {
+    const light  = isLight();
+    const dlCol  = light ? '#475569' : '#94a3b8';
+    const tipBg  = light ? '#1e293b' : '#0d1b30';
+    const aStyle = axisStyle(forMax);
+    const effMin = xExtra?.min ?? 0;
+    const dispData = rawData.map(v => v == null ? effMin : v);
+    const dispBg   = rawData.map((v, i) => v == null ? 'transparent' : bgColors[i]);
+    const dispBd   = rawData.map((v, i) => v == null ? 'transparent' : bdColors[i]);
+    const dispBw   = rawData.map(v => v == null ? 0 : 2);
+    return {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{ data: dispData, _rawData: rawData, backgroundColor: dispBg, borderColor: dispBd, borderWidth: dispBw, borderRadius: 4, borderSkipped: false }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        layout: { padding: { top: 6, right: 68, bottom: 6, left: 4 } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: tipBg, borderColor: '#1a2e4a', borderWidth: 1,
+            titleColor: '#e2e8f0', bodyColor: '#94a3b8', padding: 11,
+            callbacks: { label: ctx => { const r = ctx.dataset._rawData?.[ctx.dataIndex]; return r == null ? '  N/A' : `  ${r} ${tooltipUnit}`; } }
+          },
+          datalabels: {
+            anchor: 'end', align: 'right', clip: false,
+            color: dlCol, font: { size: forMax ? 12 : 8.5, weight: '700' }, padding: { left: 5 },
+            formatter: (_v, ctx) => dlFmt(ctx.dataset._rawData?.[ctx.dataIndex]),
+          }
+        },
+        scales: {
+          x: { ...aStyle, ...xExtra, title: { display: true, text: xAxisLabel, color: '#475569', font: { size: forMax ? 13 : 9.5, weight: '500' }, padding: { top: 6 } } },
+          y: { ...aStyle }
+        },
+        animation: { duration: 600, easing: 'easeOutQuart' }
+      }
+    };
+  }
+
+  // ══ DOUGHNUT CONFIG ══
+  function buildDoughnutCfg(labels, rawData, bgColors, bdColors, tooltipUnit, _label, dlFmt, forMax = false) {
+    const light  = isLight();
+    const tipBg  = light ? '#1e293b' : '#0d1b30';
+    const lblCol = light ? '#475569' : '#94a3b8';
+    // Exclude N/A (null) companies — they have no share to represent
+    const valid = [];
+    rawData.forEach((v, i) => { if (v != null) valid.push({ v, label: labels[i], bg: bgColors[i], bd: bdColors[i] }); });
+    const total = valid.reduce((s, x) => s + x.v, 0);
+    return {
+      type: 'doughnut',
+      data: {
+        labels: valid.map(x => x.label),
+        datasets: [{ data: valid.map(x => x.v), backgroundColor: valid.map(x => x.bg), borderColor: valid.map(x => x.bd), borderWidth: 2, hoverOffset: 10 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        layout: { padding: 10 },
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              color: lblCol, font: { size: forMax ? 13 : 9.5, family: 'Inter' }, padding: forMax ? 14 : 11, boxWidth: forMax ? 13 : 10, boxHeight: forMax ? 13 : 10,
+              generateLabels: chart => chart.data.labels.map((lbl, i) => ({
+                text: `${lbl}  ${dlFmt(chart.data.datasets[0].data[i])}`,
+                fillStyle: chart.data.datasets[0].backgroundColor[i],
+                strokeStyle: chart.data.datasets[0].borderColor[i],
+                fontColor: lblCol,
+                lineWidth: 1.5, hidden: !chart.getDataVisibility(i), index: i,
+              }))
+            }
+          },
+          tooltip: {
+            backgroundColor: tipBg, borderColor: '#1a2e4a', borderWidth: 1,
+            titleColor: '#e2e8f0', bodyColor: '#94a3b8', padding: 11,
+            callbacks: { label: ctx => { const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0; return `  ${dlFmt(ctx.parsed)}  (${pct}%)`; } }
+          },
+          datalabels: {
+            display: ctx => total > 0 && (ctx.dataset.data[ctx.dataIndex] / total) > 0.06,
+            formatter: v => `${((v / total) * 100).toFixed(0)}%`,
+            color: '#fff', font: { size: forMax ? 13 : 9, weight: '700', family: 'Inter' },
+            textShadowBlur: 4, textShadowColor: 'rgba(0,0,0,0.55)',
+          }
+        },
+        animation: { duration: 600, easing: 'easeOutQuart' }
+      }
+    };
+  }
+
+  // ══ BUILD FOR TYPE ══
+  function buildForType(id, type, forMax = false) {
+    const { allData, label, tooltipUnit, dlFmt, yExtra } = CR[id];
+    const fi = filterIndices;
+    const fRaw = fi.map(i => allData[i]);
+    const lbls = fi.map(i => CO[i]);
+    const bgs  = fi.map(i => BG[i]);
+    const bds  = fi.map(i => BD[i]);
+    if (type === 'hbar')     return buildHBarCfg(lbls, fRaw, bgs, bds, tooltipUnit, label, dlFmt, yExtra, forMax);
+    if (type === 'doughnut') return buildDoughnutCfg(lbls, fRaw, bgs, bds, tooltipUnit, label, dlFmt, forMax);
+    return buildBarCfg(lbls, fRaw, bgs, bds, tooltipUnit, label, dlFmt, yExtra, forMax);
+  }
+
+  // ══ SWITCH CHART TYPE ══
+  function switchType(id, type, btn) {
+    const entry = CR[id];
+    entry.chart.destroy();
+    btn.closest('.ct-group').querySelectorAll('.ct-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    entry.currentType = type;
+    entry.chart = new Chart(document.getElementById(id), buildForType(id, type));
+  }
+
+  // ══ INJECT TYPE BUTTONS ══
+  const BAR_SVG = `<svg viewBox="0 0 12 11" fill="currentColor"><rect x="0" y="3" width="3.5" height="8" rx="0.5"/><rect x="4.25" y="0" width="3.5" height="11" rx="0.5"/><rect x="8.5" y="5" width="3.5" height="6" rx="0.5"/></svg>`;
+  const HBAR_SVG = `<svg viewBox="0 0 11 12" fill="currentColor"><rect x="0" y="0" width="11" height="3.5" rx="0.5"/><rect x="0" y="4.25" width="7" height="3.5" rx="0.5"/><rect x="0" y="8.5" width="9.5" height="3.5" rx="0.5"/></svg>`;
+  const DONUT_SVG = `<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="6" cy="6" r="4.5"/><circle cx="6" cy="6" r="1.6" stroke-width="1.5"/></svg>`;
+
+  function injectTypeButtons() {
+    Object.keys(CR).forEach(id => {
+      if (id === 'radarChart') return;
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      const cardHd = canvas.closest('.card')?.querySelector('.card-hd');
+      if (!cardHd) return;
+      const maxBtn = cardHd.querySelector('.max-btn');
+      if (!maxBtn) return;
+      const ctg = document.createElement('div');
+      ctg.className = 'ct-group';
+      ctg.innerHTML =
+        `<button class="ct-btn active" data-type="bar"     onclick="switchType('${id}','bar',this)"     title="Vertical bar">${BAR_SVG}</button>` +
+        `<button class="ct-btn"        data-type="hbar"    onclick="switchType('${id}','hbar',this)"    title="Horizontal bar">${HBAR_SVG}</button>` +
+        `<button class="ct-btn"        data-type="doughnut" onclick="switchType('${id}','doughnut',this)" title="Doughnut">${DONUT_SVG}</button>`;
+      const right = document.createElement('div');
+      right.className = 'card-hd-right';
+      cardHd.removeChild(maxBtn);
+      right.appendChild(ctg);
+      right.appendChild(maxBtn);
+      cardHd.appendChild(right);
+    });
+  }
+
   // ══ RADAR ══
   const norm = arr => {
     const mx = Math.max(...arr.filter(v => v != null && v > 0));
@@ -874,7 +1036,7 @@
     'Social Mentions': norm([45, 25, 35, 8, 12, 180, 280, 55]),
   };
 
-  function buildRadarCfg(hiddenSet) {
+  function buildRadarCfg(hiddenSet, forMax = false) {
     const light = isLight();
     const gridCol = light ? 'rgba(203,213,225,0.65)' : 'rgba(26,46,74,0.7)';
     const labelCol = light ? '#64748b' : '#94a3b8';
@@ -898,7 +1060,7 @@
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'bottom', labels: { color: labelCol, font: { size: 10.5 }, padding: 14, boxWidth: 11, boxHeight: 11 } },
+          legend: { position: 'bottom', labels: { color: labelCol, font: { size: forMax ? 14 : 10.5 }, padding: forMax ? 18 : 14, boxWidth: forMax ? 14 : 11, boxHeight: forMax ? 14 : 11 } },
           tooltip: { backgroundColor: tipBg, borderColor: '#1a2e4a', borderWidth: 1, titleColor: '#e2e8f0', bodyColor: '#94a3b8' },
           datalabels: { display: false }
         },
@@ -907,7 +1069,7 @@
             min: 0, max: 10,
             grid: { color: gridCol },
             angleLines: { color: gridCol },
-            pointLabels: { color: labelCol, font: { size: 10, weight: '600' } },
+            pointLabels: { color: labelCol, font: { size: forMax ? 14 : 10, weight: '600' } },
             ticks: { display: false }
           }
         },
@@ -921,6 +1083,7 @@
     chart: radarChart,
     label: 'Overall Competitive Profile (Radar)',
     allData: null,
+    currentType: 'radar',
     recreate: (canvasId) => new Chart(document.getElementById(canvasId), buildRadarCfg(filterIndices))
   };
 
@@ -940,20 +1103,13 @@
     };
     document.getElementById('filterHint').textContent = hints[type];
 
-    Object.entries(CR).forEach(([id, { chart, allData, yExtra }]) => {
-      if (chart.config.type === 'bar') {
-        const fRaw  = filterIndices.map(i => allData[i]);
-        const effMin = yExtra?.min ?? 0;
-        chart.data.labels                        = filterIndices.map(i => CO[i]);
-        chart.data.datasets[0]._rawData          = fRaw;
-        chart.data.datasets[0].data              = fRaw.map(v => v == null ? effMin : v);
-        chart.data.datasets[0].backgroundColor   = fRaw.map((v, k) => v == null ? 'transparent' : BG[filterIndices[k]]);
-        chart.data.datasets[0].borderColor        = fRaw.map((v, k) => v == null ? 'transparent' : BD[filterIndices[k]]);
-        chart.data.datasets[0].borderWidth        = fRaw.map(v => v == null ? 0 : 2);
-        chart.update();
-      } else if (chart.config.type === 'radar') {
-        chart.data.datasets.forEach((ds, di) => { ds.hidden = !filterIndices.includes(di); });
-        chart.update();
+    Object.entries(CR).forEach(([id, entry]) => {
+      if (entry.currentType === 'radar') {
+        entry.chart.data.datasets.forEach((ds, di) => { ds.hidden = !filterIndices.includes(di); });
+        entry.chart.update();
+      } else {
+        entry.chart.destroy();
+        entry.chart = new Chart(document.getElementById(id), buildForType(id, entry.currentType || 'bar'));
       }
     });
   }
@@ -963,45 +1119,55 @@
     document.body.classList.toggle('light');
     const light = isLight();
     document.getElementById('themeLbl').textContent = light ? 'Dark Mode' : 'Light Mode';
-
-    const grid   = light ? 'rgba(203,213,225,0.65)' : 'rgba(26,46,74,0.6)';
-    const tick   = '#64748b';
-    const title  = '#475569';
-    const brd    = light ? '#e2e8f0' : '#1a2e4a';
-    const dlCol  = light ? '#475569' : '#94a3b8';
-    const tipBg  = light ? '#1e293b' : '#0d1b30';
-    const lbl    = light ? '#64748b' : '#94a3b8';
-
-    Object.values(CR).forEach(({ chart }) => {
-      const type = chart.config.type;
-      const opts = chart.options;
-      if (type === 'bar') {
-        ['x','y'].forEach(ax => {
-          opts.scales[ax].grid.color   = grid;
-          opts.scales[ax].ticks.color  = tick;
-          opts.scales[ax].border.color = brd;
-        });
-        if (opts.scales.y.title) opts.scales.y.title.color = title;
-      } else if (type === 'radar') {
-        opts.scales.r.grid.color        = grid;
-        opts.scales.r.angleLines.color  = grid;
-        opts.scales.r.pointLabels.color = lbl;
+    Object.entries(CR).forEach(([id, entry]) => {
+      if (entry.currentType === 'radar') {
+        const grid  = light ? 'rgba(203,213,225,0.65)' : 'rgba(26,46,74,0.6)';
+        const lbl   = light ? '#64748b' : '#94a3b8';
+        const tipBg = light ? '#1e293b' : '#0d1b30';
+        const opts  = entry.chart.options;
+        opts.scales.r.grid.color         = grid;
+        opts.scales.r.angleLines.color   = grid;
+        opts.scales.r.pointLabels.color  = lbl;
         opts.plugins.legend.labels.color = lbl;
+        opts.plugins.tooltip.backgroundColor = tipBg;
+        entry.chart.update('none');
+      } else {
+        entry.chart.destroy();
+        entry.chart = new Chart(document.getElementById(id), buildForType(id, entry.currentType || 'bar'));
       }
-      opts.plugins.datalabels.color        = dlCol;
-      opts.plugins.tooltip.backgroundColor = tipBg;
-      chart.update('none');
     });
   }
 
   // ══ MAXIMIZE ══
   function openMax(id) {
-    const { label, recreate } = CR[id];
-    document.getElementById('maxTitle').textContent = label;
+    const entry = CR[id];
+    const canvas = document.getElementById(id);
+
+    // Pull title + subtitle from the originating card / radar section
+    let title, sub;
+    if (id === 'radarChart') {
+      const hdText = canvas.closest('.radar-section')?.querySelector('.radar-hd-text');
+      title = hdText?.querySelector('h2')?.textContent || entry.label;
+      sub   = hdText?.querySelector('p')?.textContent  || '';
+    } else {
+      const card = canvas.closest('.card');
+      title = card?.querySelector('.card-title')?.textContent || entry.label;
+      sub   = card?.querySelector('.card-sub')?.textContent  || '';
+    }
+
+    document.getElementById('maxTitle').textContent = title;
+    const subEl = document.getElementById('maxSub');
+    subEl.textContent = sub;
+    subEl.style.display = sub ? '' : 'none';
+
     document.getElementById('maxOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
     if (maxChartInst) { maxChartInst.destroy(); maxChartInst = null; }
-    maxChartInst = recreate('maxCanvas');
+    if (entry.currentType === 'radar') {
+      maxChartInst = new Chart(document.getElementById('maxCanvas'), buildRadarCfg(filterIndices, true));
+    } else {
+      maxChartInst = new Chart(document.getElementById('maxCanvas'), buildForType(id, entry.currentType || 'bar', true));
+    }
   }
 
   function closeMax() {
@@ -1061,6 +1227,9 @@
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
     a.click();
   }
+
+  // Inject chart type toggle buttons into every bar chart card
+  injectTypeButtons();
 
   // ESC closes modals
   document.addEventListener('keydown', e => {

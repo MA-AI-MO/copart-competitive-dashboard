@@ -367,7 +367,7 @@
 
   <!-- 01 FINANCIAL -->
   <div class="sec-label">01 — Financial &amp; Market Scale</div>
-  <div class="g2">
+  <div class="g3">
     <div class="card">
       <div class="card-hd">
         <div class="card-title">Annual Revenue</div>
@@ -381,8 +381,16 @@
         <div class="card-title">Market Capitalization</div>
         <button class="max-btn" onclick="openMax('mktCapChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
       </div>
-      <div class="card-sub">Public market value, USD billions · year-end 2024. Manheim (private) and eBay Motors (division, not separately traded) shown as N/A.</div>
+      <div class="card-sub">Public market value, USD billions · year-end 2024. Manheim (private) and eBay Motors (division) shown as N/A.</div>
       <div class="cw"><canvas id="mktCapChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Capital Expenditure</div>
+        <button class="max-btn" onclick="openMax('capexChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Annual capex, USD billions · FY2024. Copart's high capex reflects its active land acquisition &amp; facility build-out program. Manheim &amp; eBay Motors not separately reported.</div>
+      <div class="cw"><canvas id="capexChart"></canvas></div>
     </div>
   </div>
 
@@ -441,6 +449,25 @@
       </div>
       <div class="card-sub">Vehicles available for bidding on any given day (thousands) · 2024. eBay figure = vehicles only.</div>
       <div class="cw"><canvas id="inventoryChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Towing &amp; Transporter Network</div>
+        <button class="max-btn" onclick="openMax('transportChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Contracted tow operators &amp; transport providers (thousands) · 2024. Copart owns its own fleet; others use broker networks. Digital-only &amp; retail platforms shown as N/A.</div>
+      <div class="cw"><canvas id="transportChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Title Processing (Insurance / Salvage)</div>
+        <button class="max-btn" onclick="openMax('titleChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Annual salvage &amp; insurance-seller titles processed (millions) · FY2024. Metric specific to Copart &amp; IAA — only platforms with dedicated insurance-seller lots at scale.</div>
+      <div class="cw"><canvas id="titleChart"></canvas></div>
     </div>
   </div>
 
@@ -557,6 +584,25 @@
     </div>
   </div>
 
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">YouTube Channel Subscribers</div>
+        <button class="max-btn" onclick="openMax('youtubeChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Official YouTube channel subscribers (thousands) · 2024. CarMax &amp; Carvana skew high due to consumer-facing content. B2B platforms have smaller but more targeted audiences.</div>
+      <div class="cw"><canvas id="youtubeChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Estimated Monthly SEM Spend</div>
+        <button class="max-btn" onclick="openMax('semChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Estimated paid search (Google/Bing SEM) monthly spend, USD millions · 2024. Consumer-facing platforms spend an order of magnitude more than B2B auction companies.</div>
+      <div class="cw"><canvas id="semChart"></canvas></div>
+    </div>
+  </div>
+
   <!-- RADAR -->
   <div class="sec-label">Overall Competitive Profile</div>
   <div class="radar-section">
@@ -660,6 +706,11 @@
   <strong>Driver App:</strong> Dedicated driver/transport apps only. OpenLane &amp; eBay Motors shown as N/A (no dedicated driver app).
   <strong>Social Mentions:</strong> Monthly average brand mentions across social, news &amp; web forums · estimated from public social-listening benchmarks, 2024.
   <strong>Buyer Countries:</strong> Copart investor disclosures (750K+ members, 170+ countries); peer figures are industry estimates.
+  <strong>YouTube Subscribers:</strong> Official company channel subscriber counts · estimated from publicly visible channel data, 2024.
+  <strong>SEM Spend:</strong> Estimated monthly paid search spend · derived from industry SEM benchmarks and analyst estimates, 2024. Not disclosed by any company.
+  <strong>Transport Network:</strong> Contracted tow operators and transport providers · Copart and IAA from public disclosures and industry reports; others estimated or N/A.
+  <strong>Title Processing:</strong> Annual salvage/insurance-seller titles processed · Copart and IAA only; other platforms do not operate insurance-seller-specific title programs at scale.
+  <strong>Capital Expenditure:</strong> Annual capex per FY2024 filings · Manheim and eBay Motors not separately reported. Copart's capex reflects active land acquisition program.
   All data is directional — intended for presentation use, not investment decisions.
 </footer>
 
@@ -795,7 +846,7 @@
 
   // 02 FOOTPRINT
   mkBar('locationsChart',
-    [260, 200, 75, 30, 0, 246, 33, 0],
+    [270, 200, 75, 30, 0, 246, 36, 0],
     'sites', 'Number of Locations', v => v == null ? '' : `${v}`);
 
   mkBar('acreageChart',
@@ -821,7 +872,7 @@
 
   // 04 WORKFORCE & CULTURE
   mkBar('employeesChart',
-    [15, 7, 20, 2.2, 1.7, 28, 15, null],
+    [16, 7, 20, 2.2, 1.7, 28, 15, null],
     'K people', 'Employees (Thousands)', v => v == null ? 'N/A' : `${v}K`);
 
   mkBar('glassdoorChart',
@@ -830,7 +881,7 @@
     { min: 2.5, max: 4.55 });
 
   mkBar('yearsChart',
-    [43, 43, 80, 36, 11, 32, 13, 25],
+    [42, 43, 79, 35, 10, 31, 12, 25],
     'years', 'Years in Operation', v => v == null ? '' : `${v}yr`);
 
   // 05 MAIN APP
@@ -870,6 +921,29 @@
   mkBar('socialB2bChart',
     [45, 25, 35, 8, 12, null, null, null],
     'K mentions/mo', 'B2B Auction Mentions (Thousands)', v => v == null ? 'N/A' : `${v}K`);
+
+  // 09 DIGITAL MARKETING
+  mkBar('youtubeChart',
+    [90, 20, 25, 7, 4, 115, 60, 47],
+    'K subscribers', 'YouTube Subscribers (Thousands)', v => v == null ? 'N/A' : `${v}K`);
+
+  mkBar('semChart',
+    [1.1, 0.6, 0.75, 0.35, 0.45, 11.5, 15.0, 5.0],
+    '$M/month', 'Est. Monthly SEM Spend (USD Millions)', v => v == null ? 'N/A' : `$${v}M`);
+
+  // 10 LOGISTICS
+  mkBar('transportChart',
+    [20, 10, null, null, 1, null, null, null],
+    'K providers', 'Towing & Transport Network (Thousands)', v => v == null ? 'N/A' : `${v}K`);
+
+  mkBar('titleChart',
+    [3.2, 2.1, null, null, null, null, null, null],
+    'M titles/yr', 'Insurance / Salvage Titles Processed (Millions / Year)', v => v == null ? 'N/A' : `${v}M`);
+
+  // 11 FINANCIAL (CapEx)
+  mkBar('capexChart',
+    [1.1, 0.22, null, 0.065, 0.04, 0.38, 0.35, null],
+    '$B', 'Capital Expenditure (USD Billions)', v => v == null ? 'N/A' : `$${v}B`);
 
 
   // ══ HORIZONTAL BAR CONFIG ══

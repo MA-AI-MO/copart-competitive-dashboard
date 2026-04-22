@@ -223,6 +223,65 @@
     footer a { color: #3b82f6; text-decoration: none; }
     footer a:hover { text-decoration: underline; }
 
+    /* ── THEME TOGGLE BUTTON ── */
+    .story-theme-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); cursor: pointer;
+      font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 600;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .story-theme-btn:hover { color: var(--lblue); border-color: var(--lblue); }
+    .story-theme-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ── LIGHT MODE OVERRIDES ── */
+    body.light {
+      --bg:     #f8fafc;
+      --card:   #ffffff;
+      --card2:  #f1f5f9;
+      --border: #e2e8f0;
+      --text:   #0f172a;
+      --muted:  #64748b;
+    }
+    body.light nav { background: rgba(248,250,252,0.95); border-bottom-color: #e2e8f0; }
+    body.light .nav-back { color: #64748b; }
+    body.light .nav-pill { color: #64748b; }
+    body.light .nav-pill:hover { color: var(--lblue); }
+    body.light .nav-title { color: #0f172a; }
+    body.light .hero {
+      background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 50%, #eff6ff 100%);
+      border-bottom-color: #e2e8f0;
+    }
+    body.light .hero::before { background: radial-gradient(ellipse 1000px 500px at 50% 0%, rgba(0,71,187,0.1) 0%, transparent 65%); }
+    body.light .hero h1 { color: #0f172a; }
+    body.light .hero-sub { color: #475569; }
+    body.light .hero-eyebrow { background: rgba(0,71,187,0.08); }
+    body.light .punch-item { background: rgba(0,71,187,0.05); }
+    body.light .punch-desc { color: #475569; }
+    body.light .chapter h2 { color: #0f172a; }
+    body.light .chapter-intro { color: #475569; }
+    body.light .card-title { color: #1e293b; }
+    body.light .card-sub { color: #64748b; }
+    body.light .takeaway { background: rgba(0,71,187,0.06); border-color: rgba(0,71,187,0.2); }
+    body.light .takeaway.green { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.2); }
+    body.light .takeaway.purple { background: rgba(139,92,246,0.06); border-color: rgba(139,92,246,0.2); }
+    body.light .takeaway.gold { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.2); }
+    body.light .takeaway-body { color: #1e293b; }
+    body.light .stat-val { color: #0f172a; }
+    body.light .stat-lbl { color: #475569; }
+    body.light .stat-ctx { color: #64748b; }
+    body.light .insight-col-name { color: #475569; }
+    body.light .insight-col.copart .insight-col-name { color: #0047bb; }
+    body.light .insight-check { color: #1e293b; }
+    body.light .closing {
+      background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+      border-color: rgba(0,71,187,0.25);
+    }
+    body.light .closing::before { background: radial-gradient(ellipse 600px 300px at 50% 0%, rgba(0,71,187,0.1) 0%, transparent 70%); }
+    body.light .closing h2 { color: #0f172a; }
+    body.light .closing p { color: #475569; }
+    body.light footer { background: #f1f5f9; border-top-color: #e2e8f0; color: #64748b; }
+
     @media (max-width: 860px) {
       .grid2, .grid3 { grid-template-columns: 1fr; }
       .insight-grid { grid-template-columns: 1fr; }
@@ -253,10 +312,22 @@
     <a class="nav-pill" href="#capex">CapEx</a>
     <a class="nav-pill" href="#outcomes">Outcomes</a>
   </div>
-  <a class="nav-back" href="index.html">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-    Back to Dashboard
-  </a>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="story-theme-btn" onclick="toggleStoryTheme()" id="storyThemeBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+      <span id="storyThemeLbl">Light Mode</span>
+    </button>
+    <a class="nav-back" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back to Dashboard
+    </a>
+  </div>
 </nav>
 
 <!-- ══ HERO ══ -->
@@ -605,33 +676,35 @@
 
 <script>
   Chart.register(ChartDataLabels);
-  Chart.defaults.color       = '#64748b';
-  Chart.defaults.borderColor = '#1a2e4a';
   Chart.defaults.font.family = 'Inter';
 
-  // All 8 companies, but story page focuses on Copart + primary competitors
   const CO  = ['Copart','IAA','Manheim','OpenLane','ACV','CarMax','Carvana','eBay Motors'];
   const BG  = ['rgba(0,71,187,.85)','rgba(225,29,72,.75)','rgba(249,115,22,.75)',
                'rgba(139,92,246,.75)','rgba(16,185,129,.75)','rgba(236,72,153,.75)',
                'rgba(6,182,212,.75)','rgba(234,179,8,.75)'];
   const BD  = ['#0047bb','#e11d48','#f97316','#8b5cf6','#10b981','#ec4899','#06b6d4','#eab308'];
 
-  function ax(yLabel) {
-    return {
-      x: { grid: { color: 'rgba(26,46,74,.55)' }, ticks: { color: '#64748b', font: { size: 9.5 } }, border: { color: '#1a2e4a' } },
-      y: { grid: { color: 'rgba(26,46,74,.55)' }, ticks: { color: '#64748b', font: { size: 9.5 } }, border: { color: '#1a2e4a' },
-           title: { display: true, text: yLabel, color: '#475569', font: { size: 9.5, weight: '500' }, padding: { bottom: 6 } },
-           min: 0 }
-    };
-  }
+  // Registry for theme rebuilds: id -> { allData, yLabel, tooltipSuffix, dlFmt, showAll }
+  const storyReg = {};
 
-  function mkBar(id, allData, yLabel, tooltipSuffix, dlFmt, showAll = false) {
-    // Story page: always show all 8 companies
-    const idx = showAll ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4];
+  function isStoryLight() { return document.body.classList.contains('light'); }
+
+  function _buildBar(id, allData, yLabel, tooltipSuffix, dlFmt, showAll) {
+    const lt     = isStoryLight();
+    const gridC  = lt ? 'rgba(203,213,225,0.6)' : 'rgba(26,46,74,.55)';
+    const borderC= lt ? '#e2e8f0' : '#1a2e4a';
+    const tipBg  = lt ? '#1e293b' : '#0d1b30';
+    const dlCol  = lt ? '#475569' : '#94a3b8';
+
+    const idx  = showAll ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4];
     const data = idx.map(i => allData[i]);
     const lbls = idx.map(i => CO[i]);
     const bgs  = idx.map(i => BG[i]);
     const bds  = idx.map(i => BD[i]);
+
+    const existing = Chart.getChart(id);
+    if (existing) existing.destroy();
+
     new Chart(document.getElementById(id), {
       type: 'bar',
       data: { labels: lbls, datasets: [{ data, backgroundColor: bgs, borderColor: bds, borderWidth: 2, borderRadius: 5, borderSkipped: false }] },
@@ -641,20 +714,47 @@
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: '#0d1b30', borderColor: '#1a2e4a', borderWidth: 1,
+            backgroundColor: tipBg, borderColor: borderC, borderWidth: 1,
             titleColor: '#e2e8f0', bodyColor: '#94a3b8', padding: 11,
             callbacks: { label: ctx => ctx.parsed.y == null ? '  N/A' : `  ${ctx.parsed.y} ${tooltipSuffix}` }
           },
           datalabels: {
             anchor: 'end', align: 'top', clip: false,
-            color: '#94a3b8', font: { size: 9, weight: '700' }, padding: { bottom: 2 },
+            color: dlCol, font: { size: 9, weight: '700' }, padding: { bottom: 2 },
             formatter: dlFmt,
           }
         },
-        scales: ax(yLabel),
-        animation: { duration: 800, easing: 'easeOutQuart' }
+        scales: {
+          x: { grid: { color: gridC }, ticks: { color: '#64748b', font: { size: 9.5 } }, border: { color: borderC } },
+          y: { grid: { color: gridC }, ticks: { color: '#64748b', font: { size: 9.5 } }, border: { color: borderC },
+               title: { display: true, text: yLabel, color: '#475569', font: { size: 9.5, weight: '500' }, padding: { bottom: 6 } },
+               min: 0 }
+        },
+        animation: { duration: 600, easing: 'easeOutQuart' }
       }
     });
+  }
+
+  function mkBar(id, allData, yLabel, tooltipSuffix, dlFmt, showAll = false) {
+    storyReg[id] = { allData, yLabel, tooltipSuffix, dlFmt, showAll };
+    _buildBar(id, allData, yLabel, tooltipSuffix, dlFmt, showAll);
+  }
+
+  // ── THEME TOGGLE ──
+  function toggleStoryTheme() {
+    document.body.classList.toggle('light');
+    const lt = isStoryLight();
+    localStorage.setItem('theme', lt ? 'light' : 'dark');
+    document.getElementById('storyThemeLbl').textContent = lt ? 'Dark Mode' : 'Light Mode';
+    Object.entries(storyReg).forEach(([id, cfg]) =>
+      _buildBar(id, cfg.allData, cfg.yLabel, cfg.tooltipSuffix, cfg.dlFmt, cfg.showAll)
+    );
+  }
+
+  // Restore theme from localStorage (synced with dashboard)
+  if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('storyThemeLbl').textContent = 'Dark Mode';
   }
 
   // ── CHART DATA (FY2024) ──
@@ -664,7 +764,7 @@
   mkBar('locChart',  [270, 200, 75, 30, 0, 246, 36, 0],   'Number of Locations', 'sites',    v => v==null?'':String(v), ALL8);
   mkBar('acreChart', [120, 30, 14, 4, 0, 5, 2, 0],         'Thousands of Acres',  'K acres',  v => v==null?'':v+'K', ALL8);
 
-  // Marketplace Scale (primary competitors only — B2C not comparable)
+  // Marketplace Scale
   mkBar('buyersChart',  [750, 500, 70, 85, 25, null, null, null], 'Registered Buyers (Thousands)', 'K', v => v==null?'':v+'K', ALL8);
   mkBar('buyerNatChart',[170, 40, 25, 20, 3, 1, 1, 65],          'Countries with Active Buyers',   'countries', v => v==null?'':String(v), ALL8);
   mkBar('invChart',     [180, 125, 85, 55, 18, 55, 40, 35],       'Daily Inventory (Thousands)',     'K vehicles', v => v==null?'':v+'K', ALL8);

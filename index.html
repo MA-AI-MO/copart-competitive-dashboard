@@ -395,6 +395,7 @@
   </style>
 </head>
 <body>
+<script>try{if(localStorage.getItem('theme')==='light')document.body.classList.add('light')}catch(e){}</script>
 
 <!-- ══ HEADER ══ -->
 <header>
@@ -1586,7 +1587,7 @@
   const BUBBLE_DIMS = [
     { id: 'scale-reach',   label: 'Scale vs. Reach vs. Revenue',        x: 'Locations', y: 'Reg. Buyers', r: 'Revenue' },
     { id: 'phys-mkt',      label: 'Physical vs. Marketplace Depth',     x: 'Land Acreage', y: 'Buyer Countries', r: 'Mkt Cap' },
-    { id: 'digital-vol',   label: 'Digital vs. Volume vs. CapEx',       x: 'App Downloads', y: 'Veh. Sold', r: 'CapEx' },
+    { id: 'digital-vol',   label: 'App Rating vs. Volume vs. CapEx',    x: 'App Rating', y: 'Veh. Sold', r: 'CapEx' },
     { id: 'inv-buyers',    label: 'Daily Inventory vs. Buyers vs. Revenue', x: 'Daily Inventory', y: 'Reg. Buyers', r: 'Revenue' },
   ];
 
@@ -1599,6 +1600,7 @@
     'Veh. Sold':       [3.5,  2.2,  8.5,  1.3,  0.55, 0.90, 0.42, 2.0],
     'Daily Inventory': [180,  125,  85,   55,   18,   55,   40,   35],
     'App Downloads':   [5,    2,    1,    0.5,  1,    10,   8,    5],
+    'App Rating':      [4.8,  4.3,  3.9,  3.7,  4.6,  4.8,  4.8,  4.4],
     'Reg. Buyers':     [750,  500,  70,   85,   25,   null, null, null],
     'Buyer Countries': [170,  40,   25,   20,   3,    1,    1,    65],
   };
@@ -1606,11 +1608,17 @@
   const BUBBLE_UNITS = {
     'Revenue': '$B', 'Mkt Cap': '$B', 'CapEx': '$B', 'Locations': 'sites',
     'Land Acreage': 'K acres', 'Veh. Sold': 'M/yr', 'Daily Inventory': 'K vehicles',
-    'App Downloads': 'M dl', 'Reg. Buyers': 'K members', 'Buyer Countries': 'countries',
+    'App Downloads': 'M dl', 'App Rating': '/ 5.0', 'Reg. Buyers': 'K members', 'Buyer Countries': 'countries',
   };
 
   let activeBubbleDim = 0;
   let bubbleChartInst = null;
+
+  const BUBBLE_ABBR = {
+    'Copart': 'CPT', 'IAA': 'IAA', 'Manheim': 'MAN', 'OpenLane': 'OL',
+    'ACV': 'ACV', 'CarMax': 'KMX', 'Carvana': 'CVNA', 'eBay Motors': 'eBay',
+  };
+  const BUBBLE_MIN_R = 12, BUBBLE_MAX_R = 52;
 
   function buildBubbleCfg(dimIdx) {
     const dim = BUBBLE_DIMS[dimIdx];
@@ -1620,13 +1628,14 @@
     const rMax = Math.max(...rArr.filter(v => v != null));
     const light = isLight();
     const gridCol = light ? 'rgba(203,213,225,0.6)' : 'rgba(26,46,74,0.55)';
-    const tickCol = light ? '#64748b' : '#64748b';
+    const tickCol = '#64748b';
     const tipBg   = light ? '#1e293b' : '#0d1b30';
 
     const datasets = CO.map((name, i) => {
       const xv = xArr[i], yv = yArr[i], rv = rArr[i];
       if (xv == null || yv == null || rv == null) return null;
-      const rPx = Math.max(6, Math.round((rv / rMax) * 42));
+      // Area-proportional (sqrt) sizing
+      const rPx = Math.round(BUBBLE_MIN_R + (BUBBLE_MAX_R - BUBBLE_MIN_R) * Math.sqrt(rv / rMax));
       return {
         label: name,
         data: [{ x: xv, y: yv, r: rPx }],
@@ -1634,15 +1643,22 @@
         borderColor: BD[i],
         borderWidth: i === 0 ? 3 : 1.5,
         _rawR: rv,
+        _rPx: rPx,
       };
     }).filter(Boolean);
+
+    // Compute padded axis limits
+    const xVals = datasets.map(d => d.data[0].x);
+    const yVals = datasets.map(d => d.data[0].y);
+    const xMax  = Math.max(...xVals) * 1.20;
+    const yMax  = Math.max(...yVals) * 1.25;
 
     return {
       type: 'bubble',
       data: { datasets },
       options: {
         responsive: true, maintainAspectRatio: false,
-        layout: { padding: 20 },
+        layout: { padding: { top: 30, right: 30, bottom: 10, left: 10 } },
         plugins: {
           legend: { position: 'bottom', labels: { color: light ? '#475569' : '#94a3b8', font: { size: 10.5 }, padding: 14, boxWidth: 11, boxHeight: 11 } },
           tooltip: {
@@ -1662,20 +1678,23 @@
             }
           },
           datalabels: {
-            anchor: 'center', align: 'center', clip: false,
-            color: '#fff', font: { size: 9, weight: '700' },
-            formatter: (val, ctx) => ctx.dataset.label.split(' ')[0],
+            // Place labels above the bubble to avoid internal overlap
+            anchor: 'end', align: 'top', clip: false, offset: 4,
+            color: light ? '#1e293b' : '#e2e8f0',
+            font: ctx => ({ size: ctx.dataset._rPx >= 28 ? 10 : 9, weight: '700' }),
+            formatter: (val, ctx) => BUBBLE_ABBR[ctx.dataset.label] || ctx.dataset.label,
           }
         },
         scales: {
           x: {
+            min: 0, max: xMax,
             grid: { color: gridCol }, ticks: { color: tickCol, font: { size: 9.5 } }, border: { color: '#1a2e4a' },
             title: { display: true, text: `${dim.x} (${BUBBLE_UNITS[dim.x]})`, color: '#475569', font: { size: 9.5, weight: '500' } }
           },
           y: {
+            min: 0, max: yMax,
             grid: { color: gridCol }, ticks: { color: tickCol, font: { size: 9.5 } }, border: { color: '#1a2e4a' },
             title: { display: true, text: `${dim.y} (${BUBBLE_UNITS[dim.y]})`, color: '#475569', font: { size: 9.5, weight: '500' } },
-            min: 0
           }
         },
         animation: { duration: 700, easing: 'easeOutQuart' }
@@ -1703,6 +1722,9 @@
       container.appendChild(btn);
     });
   }
+
+  // Sync theme label with whatever class the inline script set on <body>
+  if (isLight()) document.getElementById('themeLbl').textContent = 'Dark Mode';
 
   buildBubbleControls();
   bubbleChartInst = new Chart(document.getElementById('bubbleChart'), buildBubbleCfg(0));
@@ -1738,6 +1760,7 @@
   function toggleTheme() {
     document.body.classList.toggle('light');
     const light = isLight();
+    localStorage.setItem('theme', light ? 'light' : 'dark');
     document.getElementById('themeLbl').textContent = light ? 'Dark Mode' : 'Light Mode';
     Object.entries(CR).forEach(([id, entry]) => {
       if (entry.currentType === 'radar') {

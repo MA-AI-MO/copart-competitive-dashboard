@@ -687,16 +687,32 @@
   let maxChartInst = null;
 
   // ── BAR CONFIG BUILDER ──
-  function buildBarCfg(labels, data, bgColors, bdColors, tooltipUnit, yAxisLabel, dlFmt, yExtra) {
-    const light = isLight();
-    const dlCol = light ? '#475569' : '#94a3b8';
-    const tipBg = light ? '#1e293b' : '#0d1b30';
+  // rawData may contain nulls (= N/A). We render a zero-height transparent bar so
+  // chartjs-plugin-datalabels has an element to attach the "N/A" label to.
+  function buildBarCfg(labels, rawData, bgColors, bdColors, tooltipUnit, yAxisLabel, dlFmt, yExtra) {
+    const light  = isLight();
+    const dlCol  = light ? '#475569' : '#94a3b8';
+    const tipBg  = light ? '#1e293b' : '#0d1b30';
     const aStyle = axisStyle();
+    const effMin = yExtra?.min ?? 0;   // place null bar at bottom of visible range
+
+    const dispData = rawData.map(v => v == null ? effMin : v);
+    const dispBg   = rawData.map((v, i) => v == null ? 'transparent' : bgColors[i]);
+    const dispBd   = rawData.map((v, i) => v == null ? 'transparent' : bdColors[i]);
+    const dispBw   = rawData.map(v => v == null ? 0 : 2);
+
     return {
       type: 'bar',
       data: {
         labels,
-        datasets: [{ data, backgroundColor: bgColors, borderColor: bdColors, borderWidth: 2, borderRadius: 5, borderSkipped: false }]
+        datasets: [{
+          data: dispData,
+          _rawData: rawData,          // preserved for formatter & tooltip
+          backgroundColor: dispBg,
+          borderColor: dispBd,
+          borderWidth: dispBw,
+          borderRadius: 5, borderSkipped: false
+        }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
@@ -706,12 +722,17 @@
           tooltip: {
             backgroundColor: tipBg, borderColor: '#1a2e4a', borderWidth: 1,
             titleColor: '#e2e8f0', bodyColor: '#94a3b8', padding: 11,
-            callbacks: { label: ctx => ctx.parsed.y == null ? '  N/A' : `  ${ctx.parsed.y} ${tooltipUnit}` }
+            callbacks: {
+              label: ctx => {
+                const raw = ctx.dataset._rawData?.[ctx.dataIndex];
+                return raw == null ? '  N/A' : `  ${raw} ${tooltipUnit}`;
+              }
+            }
           },
           datalabels: {
             anchor: 'end', align: 'top', clip: false,
             color: dlCol, font: { size: 8.5, weight: '700' }, padding: { bottom: 2 },
-            formatter: dlFmt,
+            formatter: (_val, ctx) => dlFmt(ctx.dataset._rawData?.[ctx.dataIndex]),
           }
         },
         scales: {
@@ -725,19 +746,21 @@
 
   // ── BAR FACTORY ──
   function mkBar(id, rawData, tooltipUnit, yAxisLabel, dlFmt, yExtra = {}) {
-    const fi = filterIndices;
+    const fi  = filterIndices;
+    const fRaw = fi.map(i => rawData[i]);
     const chart = new Chart(
       document.getElementById(id),
-      buildBarCfg(fi.map(i => CO[i]), fi.map(i => rawData[i]), fi.map(i => BG[i]), fi.map(i => BD[i]), tooltipUnit, yAxisLabel, dlFmt, yExtra)
+      buildBarCfg(fi.map(i => CO[i]), fRaw, fi.map(i => BG[i]), fi.map(i => BD[i]), tooltipUnit, yAxisLabel, dlFmt, yExtra)
     );
     const recreate = (canvasId) => {
-      const fi2 = filterIndices;
+      const fi2  = filterIndices;
+      const fRaw2 = fi2.map(i => rawData[i]);
       return new Chart(
         document.getElementById(canvasId),
-        buildBarCfg(fi2.map(i => CO[i]), fi2.map(i => rawData[i]), fi2.map(i => BG[i]), fi2.map(i => BD[i]), tooltipUnit, yAxisLabel, dlFmt, yExtra)
+        buildBarCfg(fi2.map(i => CO[i]), fRaw2, fi2.map(i => BG[i]), fi2.map(i => BD[i]), tooltipUnit, yAxisLabel, dlFmt, yExtra)
       );
     };
-    CR[id] = { chart, label: yAxisLabel, allData: rawData, recreate };
+    CR[id] = { chart, label: yAxisLabel, allData: rawData, recreate, yExtra };
     return chart;
   }
 
@@ -750,7 +773,7 @@
 
   mkBar('mktCapChart',
     [54, 8, null, 1.1, 1.4, 11, 49, null],
-    '$B', 'Market Cap (USD Billions)', v => v == null ? '' : `$${v}B`);
+    '$B', 'Market Cap (USD Billions)', v => v == null ? 'N/A' : `$${v}B`);
 
   // 02 FOOTPRINT
   mkBar('locationsChart',
@@ -819,7 +842,7 @@
 
   mkBar('buyerCountriesChart',
     [170, 40, 25, 20, 3, 1, 1, 65],
-    'countries', 'Countries with Active Buyers', v => v == null ? '' : `${v}`);
+    'countries', 'Countries with Active Buyers', v => v == null ? 'N/A' : `${v}`);
 
   // 08 SOCIAL MENTIONS
   mkBar('socialChart',
@@ -829,6 +852,7 @@
   mkBar('socialB2bChart',
     [45, 25, 35, 8, 12, null, null, null],
     'K mentions/mo', 'B2B Auction Mentions (Thousands)', v => v == null ? 'N/A' : `${v}K`);
+
 
   // ══ RADAR ══
   const norm = arr => {
@@ -916,12 +940,16 @@
     };
     document.getElementById('filterHint').textContent = hints[type];
 
-    Object.entries(CR).forEach(([id, { chart, allData }]) => {
+    Object.entries(CR).forEach(([id, { chart, allData, yExtra }]) => {
       if (chart.config.type === 'bar') {
+        const fRaw  = filterIndices.map(i => allData[i]);
+        const effMin = yExtra?.min ?? 0;
         chart.data.labels                        = filterIndices.map(i => CO[i]);
-        chart.data.datasets[0].data              = filterIndices.map(i => allData[i]);
-        chart.data.datasets[0].backgroundColor   = filterIndices.map(i => BG[i]);
-        chart.data.datasets[0].borderColor        = filterIndices.map(i => BD[i]);
+        chart.data.datasets[0]._rawData          = fRaw;
+        chart.data.datasets[0].data              = fRaw.map(v => v == null ? effMin : v);
+        chart.data.datasets[0].backgroundColor   = fRaw.map((v, k) => v == null ? 'transparent' : BG[filterIndices[k]]);
+        chart.data.datasets[0].borderColor        = fRaw.map((v, k) => v == null ? 'transparent' : BD[filterIndices[k]]);
+        chart.data.datasets[0].borderWidth        = fRaw.map(v => v == null ? 0 : 2);
         chart.update();
       } else if (chart.config.type === 'radar') {
         chart.data.datasets.forEach((ds, di) => { ds.hidden = !filterIndices.includes(di); });

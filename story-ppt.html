@@ -121,7 +121,7 @@
     .chapter-tag.digital   { background: rgba(123,56,179,0.1); color: #7B38B3;       border: 1px solid rgba(123,56,179,0.25); }
     .chapter-tag.capex     { background: rgba(236,156,13,0.1); color: var(--gold);   border: 1px solid rgba(236,156,13,0.25); }
     .chapter-tag.insight   { background: rgba(15,39,87,0.07);  color: var(--navy);   border: 1px solid rgba(15,39,87,0.18); }
-    .chapter h2 { font-size: clamp(1.4rem, 2.8vw, 2rem); font-weight: 800; letter-spacing: -0.5px; color: var(--navy); margin-bottom: 10px; }
+    .chapter h2 { font-size: clamp(1.4rem, 2.8vw, 2rem); font-weight: 800; letter-spacing: -0.5px; color: var(--blue8); margin-bottom: 10px; }
     .chapter-intro { font-size: 0.95rem; color: var(--text2); max-width: 700px; line-height: 1.65; margin-bottom: 28px; }
 
     /* ── CARDS ── */
@@ -134,7 +134,7 @@
     }
     .card:hover { box-shadow: 0 3px 12px rgba(15,39,87,0.09); }
     .card.hi { border-color: var(--border2); }
-    .card-title { font-size: 0.85rem; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+    .card-title { font-size: 0.85rem; font-weight: 700; color: var(--blue8); margin-bottom: 3px; }
     .card-sub { font-size: 0.66rem; color: var(--muted); margin-bottom: 14px; line-height: 1.45; }
     .cw { position: relative; height: 220px; width: 100%; }
     .grid3 .cw { height: 200px; }
@@ -642,16 +642,16 @@
   // PPT competitor colors — matches index-ppt.html
   const CO  = ['Copart','IAA','Manheim','OpenLane','ACV','CarMax','Carvana','eBay Motors'];
   const BG  = [
-    'rgba(6,53,152,0.85)',   // Copart
-    'rgba(212,42,84,0.75)',  // IAA
-    'rgba(241,113,24,0.78)', // Manheim
-    'rgba(0,121,112,0.78)',  // OpenLane
-    'rgba(123,56,179,0.78)', // ACV
-    'rgba(38,98,217,0.75)',  // CarMax
-    'rgba(76,168,48,0.78)',  // Carvana
-    'rgba(236,156,13,0.82)', // eBay Motors
+    'rgba(6,53,152,0.85)',    // Copart — blue #063598
+    'rgba(155,170,183,0.60)', // IAA — neutral
+    'rgba(155,170,183,0.60)', // Manheim — neutral
+    'rgba(155,170,183,0.60)', // OpenLane — neutral
+    'rgba(155,170,183,0.60)', // ACV — neutral
+    'rgba(155,170,183,0.60)', // CarMax — neutral
+    'rgba(155,170,183,0.60)', // Carvana — neutral
+    'rgba(155,170,183,0.60)', // eBay Motors — neutral
   ];
-  const BD  = ['#063598','#D42A54','#F17118','#007970','#7B38B3','#2662D9','#4CA830','#EC9C0D'];
+  const BD  = ['#063598','#9BAAB7','#9BAAB7','#9BAAB7','#9BAAB7','#9BAAB7','#9BAAB7','#9BAAB7'];
 
   function mkBar(id, allData, yLabel, tooltipSuffix, dlFmt, showAll = false) {
     const idx  = showAll ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4];

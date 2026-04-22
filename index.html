@@ -171,7 +171,15 @@
 
     .card-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 3px; }
     .card-title { font-size: 0.87rem; font-weight: 700; color: var(--text-dim); flex: 1; }
-    .card-sub   { font-size: 0.68rem; color: var(--muted); margin-bottom: 16px; line-height: 1.4; }
+    .card-sub   { font-size: 0.68rem; color: var(--muted); margin-bottom: 8px; line-height: 1.4; }
+    .card-filter-badge {
+      display: none; margin-bottom: 10px;
+      font-size: 0.59rem; font-weight: 700; letter-spacing: 0.4px;
+      color: var(--lblue); background: var(--blue-soft);
+      border: 1px solid var(--blue-brd); border-radius: 100px;
+      padding: 2px 9px; width: fit-content;
+    }
+    .card-filter-badge.visible { display: inline-block; }
 
     .max-btn {
       background: none; border: 1px solid transparent; border-radius: 6px;
@@ -1748,6 +1756,7 @@
       secondary: 'Showing Copart + Secondary (CarMax · Carvana · eBay Motors)',
     };
     document.getElementById('filterHint').textContent = hints[type];
+    updateFilterBadges(type);
 
     Object.entries(CR).forEach(([id, entry]) => {
       if (entry.currentType === 'radar') {
@@ -1881,6 +1890,24 @@
 
   // Inject chart type toggle buttons into every bar chart card
   injectTypeButtons();
+
+  // ══ FILTER BADGES ══
+  function updateFilterBadges(type) {
+    const label = {
+      all: '',
+      primary:   '↳ Copart · IAA · Manheim · OpenLane · ACV',
+      secondary: '↳ Copart · CarMax · Carvana · eBay Motors',
+    }[type];
+    document.querySelectorAll('.card-filter-badge').forEach(b => {
+      b.textContent = label || '';
+      b.classList.toggle('visible', !!label);
+    });
+  }
+  document.querySelectorAll('.card-sub').forEach(sub => {
+    const badge = document.createElement('div');
+    badge.className = 'card-filter-badge';
+    sub.insertAdjacentElement('afterend', badge);
+  });
 
   // ══ SOURCE BUTTONS ══
   const SRC_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`;

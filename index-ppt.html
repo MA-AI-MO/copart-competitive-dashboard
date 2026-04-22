@@ -128,7 +128,15 @@
     .card-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 3px; }
     .card-hd-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
     .card-title { font-size: 0.85rem; font-weight: 700; color: #0047BB; }
-    .card-sub { font-size: 0.67rem; color: var(--muted); margin-bottom: 12px; line-height: 1.45; }
+    .card-sub { font-size: 0.67rem; color: var(--muted); margin-bottom: 8px; line-height: 1.45; }
+    .card-filter-badge {
+      display: none; margin-bottom: 8px;
+      font-size: 0.59rem; font-weight: 700; letter-spacing: 0.4px;
+      color: #0047BB; background: rgba(0,71,187,0.07);
+      border: 1px solid rgba(0,71,187,0.2); border-radius: 100px;
+      padding: 2px 9px; width: fit-content;
+    }
+    .card-filter-badge.visible { display: inline-block; }
     .cw { position: relative; height: 220px; }
     .max-btn {
       background: none; border: none; cursor: pointer; padding: 2px;
@@ -1168,6 +1176,7 @@
     else                           filterIndices = [...ALL_IDX];
     const hints = { all:'Showing all 8 competitors', primary:'Showing Copart + Primary (IAA · Manheim · OpenLane · ACV)', secondary:'Showing Copart + Secondary (CarMax · Carvana · eBay Motors)' };
     document.getElementById('filterHint').textContent = hints[type];
+    updateFilterBadges(type);
     Object.entries(CR).forEach(([id, entry]) => {
       if (entry.currentType === 'radar') {
         entry.chart.data.datasets.forEach((ds, di) => { ds.hidden = !filterIndices.includes(di); });
@@ -1250,6 +1259,24 @@
   }
 
   injectTypeButtons();
+
+  // ══ FILTER BADGES ══
+  function updateFilterBadges(type) {
+    const label = {
+      all: '',
+      primary:   '↳ Copart · IAA · Manheim · OpenLane · ACV',
+      secondary: '↳ Copart · CarMax · Carvana · eBay Motors',
+    }[type];
+    document.querySelectorAll('.card-filter-badge').forEach(b => {
+      b.textContent = label || '';
+      b.classList.toggle('visible', !!label);
+    });
+  }
+  document.querySelectorAll('.card-sub').forEach(sub => {
+    const badge = document.createElement('div');
+    badge.className = 'card-filter-badge';
+    sub.insertAdjacentElement('afterend', badge);
+  });
 
   // ══ SOURCE POPOVER (simplified) ══
   const SRC_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;

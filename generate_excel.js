@@ -66,15 +66,15 @@ const METRICS = [
   },
   {
     name: 'Towing & Transporter Network',
-    unit: 'Thousands of Contracted Providers',
-    note: 'Contracted tow operators & transport providers, 2024. Digital-only & retail platforms = N/A.',
-    data: [20, 10, null, null, 1, null, null, null],
+    unit: 'Thousands of Providers / Vehicles',
+    note: 'Contracted tow operators, carrier partners & owned delivery fleets, 2024. Copart/IAA = tow operators; Manheim via Cox Ready Logistics; Carvana = own delivery fleet; eBay Motors = N/A.',
+    data: [20, 10, 4, 0.5, 1, 1, 2, null],
   },
   {
-    name: 'Title Processing (Insurance / Salvage)',
+    name: 'Title Processing — All Channels',
     unit: 'Millions of Titles / Year',
-    note: 'Annual salvage & insurance-seller titles processed, FY2024. Only Copart & IAA operate at scale for this.',
-    data: [3.2, 2.1, null, null, null, null, null, null],
+    note: 'Annual titles processed or facilitated, FY2024. Copart & IAA = insurance/salvage. Manheim/OpenLane/ACV = wholesale dealer facilitation. CarMax & Carvana = retail title transfers. eBay Motors = N/A.',
+    data: [3.2, 2.1, 7.0, 1.3, 0.55, 1.8, 0.8, null],
   },
   {
     name: 'Total Employees',
@@ -147,6 +147,12 @@ const METRICS = [
     unit: 'Thousands of Subscribers',
     note: 'Official YouTube channel subscribers, 2024 estimate. B2B platforms have smaller but more targeted audiences.',
     data: [90, 20, 25, 7, 4, 115, 60, 47],
+  },
+  {
+    name: 'Monthly YouTube Mentions',
+    unit: 'Thousands / Month',
+    note: 'Est. monthly brand video mentions on YouTube (dedicated videos, reviews, creator references), 2024.',
+    data: [8, 4, 6, 1.5, 2, 95, 120, 18],
   },
   {
     name: 'Estimated Monthly SEM Spend',

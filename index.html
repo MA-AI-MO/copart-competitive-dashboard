@@ -295,6 +295,55 @@
     .max-body { flex: 1; padding: 24px; position: relative; min-height: 0; }
     .max-cw { position: relative; width: 100%; height: 100%; }
 
+    /* ── SOURCE BUTTON ── */
+    .src-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: none; border: 1px solid var(--border); border-radius: 5px;
+      color: var(--muted); cursor: pointer; padding: 3px 5px; line-height: 1;
+      transition: color .15s, border-color .15s, background .15s;
+    }
+    .src-btn:hover { color: #3b82f6; border-color: #3b82f6; background: rgba(59,130,246,.08); }
+    .src-btn svg { width: 11px; height: 11px; display: block; }
+
+    /* ── SOURCE POPOVER ── */
+    .src-pop {
+      display: none; position: fixed; z-index: 600;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; width: 360px; max-height: 300px;
+      box-shadow: 0 10px 36px rgba(0,0,0,.38);
+      flex-direction: column; overflow: hidden;
+    }
+    .src-pop.open { display: flex; }
+    .src-pop-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 14px 9px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .src-pop-label {
+      font-size: 0.65rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
+      color: #3b82f6;
+    }
+    .src-pop-close {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 1rem; padding: 2px 6px; border-radius: 4px; font-family: 'Inter', sans-serif;
+    }
+    .src-pop-close:hover { background: var(--border); color: var(--text); }
+    .src-pop-list {
+      list-style: none; overflow-y: auto; padding: 10px 14px 12px;
+      margin: 0; display: flex; flex-direction: column; gap: 5px;
+    }
+    .src-pop-list li {
+      font-size: 0.71rem; color: var(--muted); line-height: 1.5;
+      padding-left: 13px; position: relative;
+    }
+    .src-pop-list li::before {
+      content: '·'; position: absolute; left: 3px;
+      color: #0047bb; font-weight: 900; font-size: 0.9rem; line-height: 1.3;
+    }
+    .src-pop-list a {
+      color: #3b82f6; text-decoration: none;
+    }
+    .src-pop-list a:hover { text-decoration: underline; }
+
     /* ── FOOTER ── */
     footer {
       background: var(--card); border-top: 1px solid var(--border);
@@ -458,15 +507,15 @@
         <div class="card-title">Towing &amp; Transporter Network</div>
         <button class="max-btn" onclick="openMax('transportChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
       </div>
-      <div class="card-sub">Contracted tow operators &amp; transport providers (thousands) · 2024. Copart owns its own fleet; others use broker networks. Digital-only &amp; retail platforms shown as N/A.</div>
+      <div class="card-sub">Contracted tow operators, transport carrier partners &amp; owned delivery fleets (thousands) · 2024. Copart &amp; IAA = contracted tow/transport operators. Manheim via Cox Ready Logistics carrier network. ACV &amp; OpenLane = digital transport broker partners. CarMax = inter-store carrier network. Carvana = own last-mile delivery fleet. eBay Motors = peer-to-peer only (N/A).</div>
       <div class="cw"><canvas id="transportChart"></canvas></div>
     </div>
     <div class="card">
       <div class="card-hd">
-        <div class="card-title">Title Processing (Insurance / Salvage)</div>
+        <div class="card-title">Title Processing — All Channels</div>
         <button class="max-btn" onclick="openMax('titleChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
       </div>
-      <div class="card-sub">Annual salvage &amp; insurance-seller titles processed (millions) · FY2024. Metric specific to Copart &amp; IAA — only platforms with dedicated insurance-seller lots at scale.</div>
+      <div class="card-sub">Annual title transfers processed or facilitated (millions) · FY2024. Copart &amp; IAA = insurance/salvage-specific titles (core business). Manheim, OpenLane &amp; ACV = wholesale dealer-to-dealer title facilitation. CarMax &amp; Carvana = retail consumer title transfers (buy + sell combined). eBay Motors = buyer/seller arrange independently (N/A).</div>
       <div class="cw"><canvas id="titleChart"></canvas></div>
     </div>
   </div>
@@ -595,6 +644,14 @@
     </div>
     <div class="card">
       <div class="card-hd">
+        <div class="card-title">Monthly YouTube Mentions</div>
+        <button class="max-btn" onclick="openMax('youtubeMentionsChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Estimated monthly brand video mentions on YouTube (thousands) · 2024. Includes dedicated brand videos, reviews, and references in car-content creator ecosystem.</div>
+      <div class="cw"><canvas id="youtubeMentionsChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
         <div class="card-title">Estimated Monthly SEM Spend</div>
         <button class="max-btn" onclick="openMax('semChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
       </div>
@@ -679,6 +736,15 @@
   </div>
 </div>
 
+<!-- ══ SOURCE POPOVER ══ -->
+<div class="src-pop" id="srcPop">
+  <div class="src-pop-hd">
+    <span class="src-pop-label">Data Sources</span>
+    <button class="src-pop-close" onclick="closeSources()">&#x2715;</button>
+  </div>
+  <ul class="src-pop-list" id="srcPopList"></ul>
+</div>
+
 <!-- ══ MAXIMIZE MODAL ══ -->
 <div class="max-overlay" id="maxOverlay">
   <div class="max-box">
@@ -708,8 +774,8 @@
   <strong>Buyer Countries:</strong> Copart investor disclosures (750K+ members, 170+ countries); peer figures are industry estimates.
   <strong>YouTube Subscribers:</strong> Official company channel subscriber counts · estimated from publicly visible channel data, 2024.
   <strong>SEM Spend:</strong> Estimated monthly paid search spend · derived from industry SEM benchmarks and analyst estimates, 2024. Not disclosed by any company.
-  <strong>Transport Network:</strong> Contracted tow operators and transport providers · Copart and IAA from public disclosures and industry reports; others estimated or N/A.
-  <strong>Title Processing:</strong> Annual salvage/insurance-seller titles processed · Copart and IAA only; other platforms do not operate insurance-seller-specific title programs at scale.
+  <strong>Transport Network:</strong> Contracted tow operators, carrier partners & owned delivery fleets · Copart/IAA from public disclosures; Manheim via Cox Ready Logistics; Carvana from FY2024 10-K; others estimated.
+  <strong>Title Processing:</strong> Annual titles processed or facilitated · Copart & IAA = insurance/salvage; Manheim/OpenLane/ACV = wholesale dealer facilitation; CarMax & Carvana = retail consumer title transfers; eBay Motors = N/A.
   <strong>Capital Expenditure:</strong> Annual capex per FY2024 filings · Manheim and eBay Motors not separately reported. Copart's capex reflects active land acquisition program.
   All data is directional — intended for presentation use, not investment decisions.
 </footer>
@@ -927,18 +993,23 @@
     [90, 20, 25, 7, 4, 115, 60, 47],
     'K subscribers', 'YouTube Subscribers (Thousands)', v => v == null ? 'N/A' : `${v}K`);
 
+  // YouTube brand mentions (monthly, thousands) — videos, reviews & creator references
+  mkBar('youtubeMentionsChart',
+    [8, 4, 6, 1.5, 2, 95, 120, 18],
+    'K mentions/mo', 'Monthly YouTube Mentions (Thousands)', v => v == null ? 'N/A' : `${v}K`);
+
   mkBar('semChart',
     [1.1, 0.6, 0.75, 0.35, 0.45, 11.5, 15.0, 5.0],
     '$M/month', 'Est. Monthly SEM Spend (USD Millions)', v => v == null ? 'N/A' : `$${v}M`);
 
   // 10 LOGISTICS
   mkBar('transportChart',
-    [20, 10, null, null, 1, null, null, null],
-    'K providers', 'Towing & Transport Network (Thousands)', v => v == null ? 'N/A' : `${v}K`);
+    [20, 10, 4, 0.5, 1, 1, 2, null],
+    'K providers/vehicles', 'Towing & Transport Network (Thousands)', v => v == null ? 'N/A' : `${v}K`);
 
   mkBar('titleChart',
-    [3.2, 2.1, null, null, null, null, null, null],
-    'M titles/yr', 'Insurance / Salvage Titles Processed (Millions / Year)', v => v == null ? 'N/A' : `${v}M`);
+    [3.2, 2.1, 7.0, 1.3, 0.55, 1.8, 0.8, null],
+    'M titles/yr', 'Title Transfers Processed / Facilitated (Millions / Year)', v => v == null ? 'N/A' : `${v}M`);
 
   // 11 FINANCIAL (CapEx)
   mkBar('capexChart',
@@ -1060,6 +1131,236 @@
     entry.currentType = type;
     entry.chart = new Chart(document.getElementById(id), buildForType(id, type));
   }
+
+  // ══ DATA SOURCES PER CHART ══
+  // Sources: plain string = no link; {text, url} = clickable link
+  const SOURCES = {
+    revenueChart: [
+      { text: 'Copart FY2024 10-K (fiscal year ending July 2024)', url: 'https://investors.copart.com/financial-information/annual-reports' },
+      { text: 'RB Global (IAA) FY2024 Annual Report', url: 'https://investors.rbglobal.com/financial-information/annual-reports' },
+      { text: 'OPENLANE FY2024 Annual Report', url: 'https://investors.openlane.com/financial-information/annual-reports' },
+      { text: 'ACV Auctions FY2024 10-K', url: 'https://investors.acvauctions.com/financial-information/annual-reports' },
+      { text: 'CarMax FY2025 Annual Report (fiscal year ending Feb 2025)', url: 'https://investors.carmax.com/financial-information/annual-reports' },
+      { text: 'Carvana FY2024 10-K', url: 'https://investors.carvana.com/financial-information/annual-reports' },
+      'Manheim / Cox Automotive: private company — revenue estimated from Cox Automotive total disclosures',
+      { text: 'eBay Inc. FY2024 Annual Report (Motors contribution estimated)', url: 'https://investors.ebayinc.com/financial-information/annual-reports' },
+    ],
+    mktCapChart: [
+      'NASDAQ / NYSE public market data — year-end 2024 approximations',
+      'Tickers: CPRT (Copart), RBA (RB Global/IAA), KAR (OPENLANE), ACVA (ACV), KMX (CarMax), CVNA (Carvana)',
+      'Manheim (Cox Automotive): private company — not applicable',
+      'eBay Motors: division of eBay Inc., not separately traded — not applicable',
+    ],
+    capexChart: [
+      { text: 'Copart FY2024 10-K — capital expenditures (active land acquisition & facility build-out)', url: 'https://investors.copart.com/financial-information/annual-reports' },
+      { text: 'RB Global (IAA) FY2024 Annual Report', url: 'https://investors.rbglobal.com/financial-information/annual-reports' },
+      { text: 'OPENLANE FY2024 Annual Report', url: 'https://investors.openlane.com/financial-information/annual-reports' },
+      { text: 'ACV Auctions FY2024 10-K', url: 'https://investors.acvauctions.com/financial-information/annual-reports' },
+      { text: 'CarMax FY2025 Annual Report', url: 'https://investors.carmax.com/financial-information/annual-reports' },
+      { text: 'Carvana FY2024 10-K', url: 'https://investors.carvana.com/financial-information/annual-reports' },
+      'Manheim / Cox Automotive: private — capex not separately reported (N/A)',
+      'eBay Motors: division — capex not separately reported (N/A)',
+    ],
+    locationsChart: [
+      { text: 'Copart location finder — ~270 global locations (FY2024 10-K)', url: 'https://www.copart.com/content/us/en/find-a-location.html' },
+      { text: 'IAA location finder — ~200 salvage locations US/Canada', url: 'https://www.iaai.com/Locations' },
+      { text: 'Manheim location directory — ~75 auction locations', url: 'https://www.manheim.com/locations' },
+      { text: 'OpenLane — ~30 physical sites (FY2024 Annual Report)', url: 'https://investors.openlane.com/financial-information/annual-reports' },
+      { text: 'CarMax store locator — 246 superstores (FY2024 Annual Report)', url: 'https://www.carmax.com/stores' },
+      { text: 'Carvana IRCs (Inspection & Reconditioning Centers) — investor disclosures 2024', url: 'https://investors.carvana.com/financial-information/annual-reports' },
+      'ACV Auctions: digital-only platform — no physical auction lots',
+      'eBay Motors: digital marketplace — no physical lots',
+    ],
+    acreageChart: [
+      { text: 'Copart FY2024 10-K / Annual Report — 120,000+ acres owned & leased globally', url: 'https://investors.copart.com/financial-information/annual-reports' },
+      { text: 'IAA (RB Global) FY2024 Annual Report — acreage from property disclosures', url: 'https://investors.rbglobal.com/financial-information/annual-reports' },
+      'Manheim: estimated from location count × average site size (industry benchmark)',
+      'CarMax & Carvana: estimated from facility count × average store/IRC acreage',
+      'ACV Auctions & eBay Motors: digital-only — near zero physical acreage',
+    ],
+    countriesChart: [
+      { text: 'Copart FY2024 10-K — 11 countries: US, UK, Canada, Germany, UAE, Ireland, Finland, Spain, Bahrain, Oman, Brazil', url: 'https://investors.copart.com/financial-information/annual-reports' },
+      { text: 'RB Global (IAA) — US & Canada operations (investor presentations 2024)', url: 'https://investors.rbglobal.com/financial-information/annual-reports' },
+      'Manheim / Cox Automotive: international operations disclosures',
+      { text: 'OPENLANE FY2024 Annual Report', url: 'https://investors.openlane.com/financial-information/annual-reports' },
+      { text: 'ACV Auctions FY2024 10-K — US & Canada', url: 'https://investors.acvauctions.com/financial-information/annual-reports' },
+      'CarMax and Carvana: US-only operations',
+      { text: 'eBay Inc. — international market country disclosures (Motors estimated)', url: 'https://investors.ebayinc.com/financial-information/annual-reports' },
+    ],
+    vehiclesAssignedChart: [
+      { text: 'Copart FY2024 10-K — vehicles offered/assigned at auction', url: 'https://investors.copart.com/financial-information/annual-reports' },
+      { text: 'RB Global (IAA) FY2024 Annual Report', url: 'https://investors.rbglobal.com/financial-information/annual-reports' },
+      'Manheim / Cox Automotive wholesale volume estimates (industry reports)',
+      { text: 'OPENLANE FY2024 Annual Report', url: 'https://investors.openlane.com/financial-information/annual-reports' },
+      { text: 'ACV Auctions FY2024 10-K', url: 'https://investors.acvauctions.com/financial-information/annual-reports' },
+      { text: 'CarMax FY2025 Annual Report — retail + wholesale units', url: 'https://investors.carmax.com/financial-information/annual-reports' },
+      { text: 'Carvana FY2024 10-K — retail units sold', url: 'https://investors.carvana.com/financial-information/annual-reports' },
+      { text: 'eBay Inc. Annual Report — Motors active listing estimates', url: 'https://investors.ebayinc.com/financial-information/annual-reports' },
+    ],
+    vehiclesSoldChart: [
+      { text: 'Copart FY2024 10-K — units sold at auction', url: 'https://investors.copart.com/financial-information/annual-reports' },
+      { text: 'RB Global (IAA) FY2024 Annual Report', url: 'https://investors.rbglobal.com/financial-information/annual-reports' },
+      'Manheim / Cox Automotive wholesale volume estimates',
+      { text: 'OPENLANE FY2024 Annual Report', url: 'https://investors.openlane.com/financial-information/annual-reports' },
+      { text: 'ACV Auctions FY2024 10-K', url: 'https://investors.acvauctions.com/financial-information/annual-reports' },
+      { text: 'CarMax FY2025 Annual Report — ~900K retail units sold', url: 'https://investors.carmax.com/financial-information/annual-reports' },
+      { text: 'Carvana FY2024 10-K — 416K retail units sold', url: 'https://investors.carvana.com/financial-information/annual-reports' },
+      { text: 'eBay Inc. Annual Report — GMV-based Motors estimate', url: 'https://investors.ebayinc.com/financial-information/annual-reports' },
+    ],
+    inventoryChart: [
+      { text: 'Copart investor presentations & FY2024 Annual Report — 180K+ vehicles on lots', url: 'https://investors.copart.com/financial-information/annual-reports' },
+      { text: 'IAA (RB Global) FY2024 Annual Report', url: 'https://investors.rbglobal.com/financial-information/annual-reports' },
+      'Manheim / Cox Automotive industry volume estimates',
+      { text: 'CarMax FY2025 Annual Report — vehicle inventory levels', url: 'https://investors.carmax.com/financial-information/annual-reports' },
+      { text: 'Carvana FY2024 10-K — vehicle inventory', url: 'https://investors.carvana.com/financial-information/annual-reports' },
+      'Peer estimates: annual volume ÷ average days-on-lot (industry benchmarks)',
+      'eBay Motors: active vehicle-only listings estimate',
+    ],
+    transportChart: [
+      { text: 'Copart investor presentations — 20,000+ contracted tow operators & dedicated fleet', url: 'https://investors.copart.com/financial-information/annual-reports' },
+      { text: 'IAA (RB Global) — Transparent Transport platform; ~10,000 contracted providers', url: 'https://investors.rbglobal.com/financial-information/annual-reports' },
+      'Manheim / Cox Automotive — Ready Logistics division; ~4,000 carrier partners',
+      'OpenLane — ~500 digital broker transport partners (estimated)',
+      'ACV Transportation — ~1,000 carrier partners; product launch announcements 2021–2024',
+      { text: 'CarMax — inter-store carrier network; ~1,000+ auction transport partners (investor relations)', url: 'https://investors.carmax.com/financial-information/annual-reports' },
+      { text: 'Carvana — 2,000+ own last-mile delivery vehicles (FY2024 10-K)', url: 'https://investors.carvana.com/financial-information/annual-reports' },
+      'eBay Motors — peer-to-peer only; buyer arranges independent shipping (N/A)',
+      { text: 'Industry context: NAAA (National Auto Auction Association)', url: 'https://www.naaa.com/' },
+    ],
+    titleChart: [
+      { text: 'Copart FY2024 10-K — Title Express service; ~3.2M insurance/salvage titles/year', url: 'https://investors.copart.com/financial-information/annual-reports' },
+      { text: 'IAA (RB Global) FY2024 Annual Report — title services; ~2.1M titles/year', url: 'https://investors.rbglobal.com/financial-information/annual-reports' },
+      'Manheim / Cox Automotive — ~7M wholesale dealer-to-dealer title transfers facilitated',
+      { text: 'OPENLANE FY2024 Annual Report — ~1.3M wholesale dealer title transfers', url: 'https://investors.openlane.com/financial-information/annual-reports' },
+      { text: 'ACV Auctions — ACV Title Services; ~550K dealer title transfers (FY2024 10-K)', url: 'https://investors.acvauctions.com/financial-information/annual-reports' },
+      { text: 'CarMax FY2025 Annual Report — ~1.8M retail title transfers (buy + sell combined)', url: 'https://investors.carmax.com/financial-information/annual-reports' },
+      { text: 'Carvana FY2024 10-K — ~800K retail title transfers (purchases + sales combined)', url: 'https://investors.carvana.com/financial-information/annual-reports' },
+      'eBay Motors — peer-to-peer; buyer and seller manage title independently (N/A)',
+    ],
+    employeesChart: [
+      { text: 'Copart FY2024 10-K — approximately 16,000 employees', url: 'https://investors.copart.com/financial-information/annual-reports' },
+      { text: 'RB Global (IAA) FY2024 Annual Report', url: 'https://investors.rbglobal.com/financial-information/annual-reports' },
+      'Manheim: estimated from Cox Automotive total headcount disclosures',
+      { text: 'OPENLANE FY2024 Annual Report', url: 'https://investors.openlane.com/financial-information/annual-reports' },
+      { text: 'ACV Auctions FY2024 10-K', url: 'https://investors.acvauctions.com/financial-information/annual-reports' },
+      { text: 'CarMax FY2025 Annual Report — ~27,000–28,000 employees', url: 'https://investors.carmax.com/financial-information/annual-reports' },
+      { text: 'Carvana FY2024 10-K — ~14,000–15,000 after 2022–2023 reductions', url: 'https://investors.carvana.com/financial-information/annual-reports' },
+      'eBay Motors: employees not separately reportable as a division — N/A',
+    ],
+    glassdoorChart: [
+      { text: 'Glassdoor — Copart employee reviews (2024 average)', url: 'https://www.glassdoor.com/Reviews/Copart-Reviews-E47352.htm' },
+      { text: 'Glassdoor — IAA / RB Global employee reviews', url: 'https://www.glassdoor.com/Reviews/IAA-Inc-Reviews-E3781.htm' },
+      { text: 'Glassdoor — Manheim employee reviews', url: 'https://www.glassdoor.com/Reviews/Manheim-Reviews-E9280.htm' },
+      { text: 'Glassdoor — OPENLANE employee reviews', url: 'https://www.glassdoor.com/Reviews/OPENLANE-Reviews-E302191.htm' },
+      { text: 'Glassdoor — ACV Auctions employee reviews', url: 'https://www.glassdoor.com/Reviews/ACV-Auctions-Reviews-E2059621.htm' },
+      { text: 'Glassdoor — CarMax employee reviews', url: 'https://www.glassdoor.com/Reviews/CarMax-Reviews-E1722.htm' },
+      { text: 'Glassdoor — Carvana employee reviews', url: 'https://www.glassdoor.com/Reviews/Carvana-Reviews-E830370.htm' },
+      { text: 'Glassdoor — eBay employee reviews (Motors division)', url: 'https://www.glassdoor.com/Reviews/eBay-Reviews-E7853.htm' },
+    ],
+    yearsChart: [
+      'Copart: founded 1982 (Vallejo, CA) — 42 years as of 2024',
+      'IAA (Insurance Auto Auctions): founded 1982 — 43 years',
+      'Manheim: founded 1945 (Manheim, PA) — 79 years',
+      'OpenLane: based on ADESA founding 1989 — 35 years',
+      'ACV Auctions: founded 2014 — 10 years',
+      'CarMax: founded 1993 — 31 years',
+      'Carvana: founded 2012 — 12 years',
+      'eBay Motors: launched 1999 as part of eBay — 25 years',
+    ],
+    appRatingChart: [
+      { text: 'Copart — "Copart - Vehicle Auction" iOS App Store page', url: 'https://apps.apple.com/us/app/copart-vehicle-auction/id396631986' },
+      { text: 'IAA — "IAA Auctions" iOS App Store page', url: 'https://apps.apple.com/us/app/iaa-auctions/id547750048' },
+      { text: 'Manheim — "Manheim" iOS App Store page', url: 'https://apps.apple.com/us/app/manheim/id401127183' },
+      { text: 'OpenLane — "OPENLANE" iOS App Store page', url: 'https://apps.apple.com/us/app/openlane/id886754411' },
+      { text: 'ACV Auctions — "ACV Auctions" iOS App Store page', url: 'https://apps.apple.com/us/app/acv-auctions/id1225472383' },
+      { text: 'CarMax — "CarMax - Used Cars For Sale" iOS App Store page', url: 'https://apps.apple.com/us/app/carmax-used-cars-for-sale/id799395947' },
+      { text: 'Carvana — "Carvana - Shop Cars Online" iOS App Store page', url: 'https://apps.apple.com/us/app/carvana-buy-sell-cars-online/id801105739' },
+      { text: 'eBay Motors — "eBay Motors" iOS App Store page', url: 'https://apps.apple.com/us/app/ebay-motors-cars-bikes/id714943272' },
+    ],
+    appDownloadsChart: [
+      'Combined iOS + Android total download estimates · 2024',
+      { text: 'Sensor Tower — app download analytics platform', url: 'https://sensortower.com/' },
+      { text: 'AppFollow — app analytics and reviews platform', url: 'https://appfollow.io/' },
+      'eBay Motors app counted separately from the main eBay marketplace app',
+      'No company publicly discloses exact download figures; all estimates are directional',
+    ],
+    driverRatingChart: [
+      { text: 'Copart — "Copart Member Transport" iOS App Store page', url: 'https://apps.apple.com/us/app/copart-member-transport/id1191986308' },
+      { text: 'IAA — "IAA Transporter" iOS App Store page', url: 'https://apps.apple.com/us/app/iaa-transporter/id1367519028' },
+      'Manheim — dedicated transport iOS app (Manheim Transport)',
+      'ACV — "ACV Transportation" driver iOS app',
+      'CarMax — carrier/transport iOS app',
+      'Carvana — last-mile delivery driver iOS app',
+      'OpenLane & eBay Motors: no dedicated driver app — N/A',
+    ],
+    driverDownloadsChart: [
+      'Combined iOS + Android driver/transport app download estimates · 2024',
+      { text: 'Sensor Tower — app download analytics platform', url: 'https://sensortower.com/' },
+      'OpenLane & eBay Motors: no dedicated driver app — N/A',
+      'No company publicly discloses exact download figures; estimates are directional',
+    ],
+    buyersChart: [
+      { text: 'Copart FY2024 investor disclosures — 750,000+ registered global members', url: 'https://investors.copart.com/financial-information/annual-reports' },
+      { text: 'IAA (RB Global) investor presentations — registered buyer account count', url: 'https://investors.rbglobal.com/financial-information/annual-reports' },
+      'Manheim: dealer-only access; registered dealer buyer estimate from industry reports',
+      { text: 'OPENLANE FY2024 Annual Report — registered dealer buyer count', url: 'https://investors.openlane.com/financial-information/annual-reports' },
+      { text: 'ACV Auctions FY2024 10-K — active dealer network size', url: 'https://investors.acvauctions.com/financial-information/annual-reports' },
+      'CarMax, Carvana, eBay Motors: B2C retail models — metric not comparable (N/A)',
+    ],
+    buyerCountriesChart: [
+      { text: 'Copart FY2024 investor disclosures — buyers from 170+ countries', url: 'https://investors.copart.com/financial-information/annual-reports' },
+      { text: 'IAA (RB Global) investor presentations — international buyer reach', url: 'https://investors.rbglobal.com/financial-information/annual-reports' },
+      'Manheim, OpenLane, ACV: international buyer estimates from company disclosures',
+      'CarMax, Carvana: US-only retail operations (1 country each)',
+      { text: 'eBay Inc. global marketplace — Motors buyer country estimate', url: 'https://investors.ebayinc.com/financial-information/annual-reports' },
+    ],
+    socialChart: [
+      'Estimated average monthly brand mentions across social platforms, news & forums · 2024',
+      'Platforms: Twitter/X, LinkedIn, Facebook, Instagram, Reddit, blogs, news sites',
+      { text: 'Methodology: Brandwatch industry benchmarks', url: 'https://www.brandwatch.com/' },
+      { text: 'Mention.com social listening benchmarks', url: 'https://mention.com/' },
+      'No company publicly reports social mention volume; all figures are directional estimates',
+    ],
+    socialB2bChart: [
+      'B2B/salvage-auction segment mentions only — excludes consumer retail traffic · 2024',
+      'Derived by filtering brand mentions for auction, salvage & wholesale keywords',
+      { text: 'Brandwatch industry benchmarks', url: 'https://www.brandwatch.com/' },
+      'CarMax, Carvana, eBay Motors excluded — consumer brand traffic dominates for these companies',
+    ],
+    youtubeChart: [
+      { text: 'Copart — official YouTube channel', url: 'https://www.youtube.com/@Copart' },
+      { text: 'IAA Auctions — official YouTube channel', url: 'https://www.youtube.com/@IAAauctions' },
+      { text: 'Manheim — official YouTube channel', url: 'https://www.youtube.com/@Manheim' },
+      { text: 'OPENLANE — official YouTube channel', url: 'https://www.youtube.com/@OPENLANE' },
+      { text: 'ACV Auctions — official YouTube channel', url: 'https://www.youtube.com/@ACVAuctions' },
+      { text: 'CarMax — official YouTube channel', url: 'https://www.youtube.com/@CarMax' },
+      { text: 'Carvana — official YouTube channel', url: 'https://www.youtube.com/@Carvana' },
+      { text: 'eBay Motors — official YouTube channel', url: 'https://www.youtube.com/@eBayMotors' },
+      'Subscriber counts as publicly visible on YouTube, rounded to nearest thousand · 2024',
+    ],
+    youtubeMentionsChart: [
+      'Estimated average monthly brand video mentions on YouTube · 2024',
+      'Includes: dedicated brand videos, product reviews, creator references in car-content ecosystem',
+      { text: 'Social Blade — YouTube channel analytics', url: 'https://socialblade.com/' },
+      { text: 'Brandwatch — social listening benchmarks', url: 'https://www.brandwatch.com/' },
+      'Consumer-facing brands (CarMax, Carvana) dominate due to car-review creator ecosystems',
+      'YouTube does not publish per-brand mention counts; all figures are directional estimates',
+    ],
+    semChart: [
+      { text: 'SEMrush — paid search traffic analytics', url: 'https://www.semrush.com/' },
+      { text: 'SimilarWeb — paid traffic estimates', url: 'https://www.similarweb.com/' },
+      'No company publicly discloses SEM budgets; all figures are industry benchmark estimates · 2024',
+      'Consumer-facing platforms (Carvana, CarMax) spend an order of magnitude more than B2B companies',
+      'eBay Motors SEM estimated as a portion of eBay Inc. total paid search investment',
+    ],
+    radarChart: [
+      'Composite radar — normalized scores 0–10 per dimension (10 = best-in-class in the group)',
+      'Each axis derived from the corresponding bar chart metric in this dashboard',
+      'Normalization: each company\'s raw value scaled relative to the group maximum',
+      'Scores are directional — axes are not equally weighted in business importance',
+      'All individual metric sources apply; see each chart\'s source icon for specifics',
+    ],
+  };
 
   // ══ INJECT TYPE BUTTONS ══
   const BAR_SVG = `<svg viewBox="0 0 12 11" fill="currentColor"><rect x="0" y="3" width="3.5" height="8" rx="0.5"/><rect x="4.25" y="0" width="3.5" height="11" rx="0.5"/><rect x="8.5" y="5" width="3.5" height="6" rx="0.5"/></svg>`;
@@ -1304,6 +1605,79 @@
 
   // Inject chart type toggle buttons into every bar chart card
   injectTypeButtons();
+
+  // ══ SOURCE BUTTONS ══
+  const SRC_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`;
+
+  let _activeSrcBtn = null;
+
+  function openSources(id, btn) {
+    const pop  = document.getElementById('srcPop');
+    const list = document.getElementById('srcPopList');
+    const srcs = SOURCES[id] || ['No source data recorded for this chart.'];
+    list.innerHTML = srcs.map(s => {
+      if (s && typeof s === 'object' && s.url)
+        return `<li><a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.text}</a></li>`;
+      return `<li>${typeof s === 'object' ? s.text : s}</li>`;
+    }).join('');
+    pop.classList.add('open');
+    _activeSrcBtn = btn;
+
+    // Position: align right edge to button right, drop below
+    const rect = btn.getBoundingClientRect();
+    const popW = 360;
+    let left = rect.right - popW;
+    let top  = rect.bottom + 8;
+    if (left < 8) left = 8;
+    if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
+    if (top + 300 > window.innerHeight - 8) top = rect.top - 300 - 8;
+    pop.style.left = `${left}px`;
+    pop.style.top  = `${top}px`;
+  }
+
+  function closeSources() {
+    document.getElementById('srcPop').classList.remove('open');
+    _activeSrcBtn = null;
+  }
+
+  function toggleSources(id, btn) {
+    const pop = document.getElementById('srcPop');
+    if (_activeSrcBtn === btn && pop.classList.contains('open')) { closeSources(); return; }
+    openSources(id, btn);
+  }
+
+  function injectSourceButtons() {
+    Object.keys(SOURCES).forEach(id => {
+      const btn = document.createElement('button');
+      btn.className = 'src-btn';
+      btn.title = 'Data Sources';
+      btn.innerHTML = SRC_SVG;
+      btn.addEventListener('click', e => { e.stopPropagation(); toggleSources(id, btn); });
+
+      if (id === 'radarChart') {
+        // Radar: insert before its max-btn
+        const radarHd = document.querySelector('.radar-hd');
+        const maxBtn  = radarHd?.querySelector('.max-btn');
+        if (maxBtn) radarHd.insertBefore(btn, maxBtn);
+        return;
+      }
+
+      // Regular cards: prepend to .card-hd-right (created by injectTypeButtons)
+      const canvas    = document.getElementById(id);
+      const hdRight   = canvas?.closest('.card')?.querySelector('.card-hd-right');
+      if (hdRight) hdRight.insertBefore(btn, hdRight.firstChild);
+    });
+  }
+
+  injectSourceButtons();
+
+  // Click outside closes source popover
+  document.addEventListener('click', e => {
+    const pop = document.getElementById('srcPop');
+    if (pop.classList.contains('open') && !pop.contains(e.target) && !e.target.closest('.src-btn')) {
+      closeSources();
+    }
+  });
 
   // ESC closes modals
   document.addEventListener('keydown', e => {

@@ -212,6 +212,36 @@
     .radar-section p  { font-size: 0.84rem; color: var(--muted); }
     .radar-wrap { max-width: 780px; margin: 0 auto; }
 
+    /* ── RADAR METRIC FILTER ── */
+    .radar-metric-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+    .rmf-btn {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.3px;
+      padding: 4px 10px; border-radius: 100px; cursor: pointer; transition: all .18s;
+      border: 1px solid var(--border); background: none; color: var(--muted);
+    }
+    .rmf-btn.on { border-color: #0047bb; background: rgba(0,71,187,0.18); color: #60a5fa; }
+    .rmf-btn:hover:not(.on) { border-color: #3b82f6; color: #93c5fd; }
+    .rmf-reset { font-size: 0.68rem; font-weight: 700; padding: 4px 10px; border-radius: 100px;
+      cursor: pointer; border: 1px solid rgba(255,255,255,0.12); background: none; color: #64748b; transition: all .18s; }
+    .rmf-reset:hover { color: #f87171; border-color: #f87171; }
+
+    /* ── BUBBLE CHART ── */
+    .bubble-section {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 36px; margin-bottom: 24px;
+    }
+    .bubble-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+    .bubble-hd-text h2 { font-size: 1.4rem; font-weight: 800; color: var(--text); margin-bottom: 5px; }
+    .bubble-hd-text p { font-size: 0.84rem; color: var(--muted); }
+    .bubble-controls { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+    .bubble-btn {
+      font-size: 0.68rem; font-weight: 700; padding: 5px 11px; border-radius: 6px;
+      border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; transition: all .18s;
+    }
+    .bubble-btn.active { border-color: #0047bb; background: rgba(0,71,187,0.18); color: #60a5fa; }
+    .bubble-btn:hover:not(.active) { border-color: #3b82f6; color: #93c5fd; }
+    .bubble-wrap { position: relative; height: 480px; }
+
     /* ── WHERE COPART LEADS ── */
     .dom-section {
       background: var(--card); border: 1px solid var(--border);
@@ -373,6 +403,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
       <span id="themeLbl">Light Mode</span>
     </button>
+    <a class="ctrl-btn" href="story.html" style="text-decoration:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <span>Insurance Story</span>
+    </a>
     <button class="ctrl-btn" onclick="openDownloadModal()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       <span>Download Data</span>
@@ -665,12 +699,26 @@
   <div class="radar-section">
     <div class="radar-hd">
       <div class="radar-hd-text">
-        <h2>Web Chart — 8 Competitors · 11 Dimensions</h2>
-        <p>Normalized scores 0–10 per axis (10 = best-in-class).</p>
+        <h2 id="radarTitle">Web Chart — 8 Competitors · 11 Dimensions</h2>
+        <p>Normalized scores 0–10 per axis (10 = best-in-class). Toggle axes below.</p>
       </div>
       <button class="max-btn" onclick="openMax('radarChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
     </div>
+    <div class="radar-metric-filter" id="radarMetricFilter"></div>
     <div class="radar-wrap"><div class="cw"><canvas id="radarChart"></canvas></div></div>
+  </div>
+
+  <!-- BUBBLE CHART -->
+  <div class="sec-label">Multi-Dimension Comparison</div>
+  <div class="bubble-section">
+    <div class="bubble-hd">
+      <div class="bubble-hd-text">
+        <h2>Bubble Chart — Scale vs. Reach vs. Revenue</h2>
+        <p>Each bubble = one competitor. X = Physical Locations · Y = Registered Buyers · Bubble Size = Annual Revenue. Switch dimensions below.</p>
+      </div>
+    </div>
+    <div class="bubble-controls" id="bubbleControls"></div>
+    <div class="bubble-wrap"><canvas id="bubbleChart"></canvas></div>
   </div>
 
   <!-- WHERE COPART LEADS -->
@@ -944,7 +992,7 @@
   mkBar('glassdoorChart',
     [3.9, 3.4, 3.7, 3.5, 3.9, 3.9, 3.3, 3.8],
     '/ 5.0', 'Glassdoor Rating (out of 5.0)', v => v == null ? '' : v.toFixed(1),
-    { min: 2.5, max: 4.55 });
+    );
 
   mkBar('yearsChart',
     [42, 43, 79, 35, 10, 31, 12, 25],
@@ -954,7 +1002,7 @@
   mkBar('appRatingChart',
     [4.8, 4.3, 3.9, 3.7, 4.6, 4.8, 4.8, 4.4],
     '/ 5.0', 'App Store Rating (out of 5.0)', v => v == null ? '' : v.toFixed(1),
-    { min: 3.0, max: 5.15 });
+    );
 
   mkBar('appDownloadsChart',
     [5, 2, 1, 0.5, 1, 10, 8, 5],
@@ -964,7 +1012,7 @@
   mkBar('driverRatingChart',
     [4.5, 4.0, 3.8, null, 4.2, 4.3, 4.5, null],
     '/ 5.0', 'Driver App Rating (out of 5.0)', v => v == null ? 'N/A' : v.toFixed(1),
-    { min: 3.0, max: 5.15 });
+    );
 
   mkBar('driverDownloadsChart',
     [1.0, 0.5, 0.3, null, 0.4, 0.8, 1.2, null],
@@ -1136,7 +1184,7 @@
   // Sources: plain string = no link; {text, url} = clickable link
   const SOURCES = {
     revenueChart: [
-      { text: 'Copart FY2024 10-K (fiscal year ending July 2024)', url: 'https://corporate.copart.com/investor-relations' },
+      { text: 'Copart FY2024 10-K (fiscal year ending July 2024)', url: 'https://www.sec.gov/Archives/edgar/data/900075/000090007524000024/cprt-20240731.htm' },
       { text: 'RB Global (IAA) FY2024 Annual Report', url: 'https://investor.rbglobal.com/home/default.aspx' },
       { text: 'OPENLANE FY2024 Annual Report', url: 'https://ir.corporate.openlane.com/investor-relations/financials/financial-reports/default.aspx' },
       { text: 'ACV Auctions FY2024 10-K', url: 'https://investors.acvauto.com/sec-filings/annual-reports' },
@@ -1152,7 +1200,7 @@
       'eBay Motors: division of eBay Inc., not separately traded — not applicable',
     ],
     capexChart: [
-      { text: 'Copart FY2024 10-K — capital expenditures (active land acquisition & facility build-out)', url: 'https://corporate.copart.com/investor-relations' },
+      { text: 'Copart FY2024 10-K — capital expenditures (active land acquisition & facility build-out)', url: 'https://www.sec.gov/Archives/edgar/data/900075/000090007524000024/cprt-20240731.htm' },
       { text: 'RB Global (IAA) FY2024 Annual Report', url: 'https://investor.rbglobal.com/home/default.aspx' },
       { text: 'OPENLANE FY2024 Annual Report', url: 'https://ir.corporate.openlane.com/investor-relations/financials/financial-reports/default.aspx' },
       { text: 'ACV Auctions FY2024 10-K', url: 'https://investors.acvauto.com/sec-filings/annual-reports' },
@@ -1172,14 +1220,14 @@
       'eBay Motors: digital marketplace — no physical lots',
     ],
     acreageChart: [
-      { text: 'Copart FY2024 10-K / Annual Report — 120,000+ acres owned & leased globally', url: 'https://corporate.copart.com/investor-relations' },
+      { text: 'Copart FY2024 10-K / Annual Report — 120,000+ acres owned & leased globally', url: 'https://www.sec.gov/Archives/edgar/data/900075/000090007524000024/cprt-20240731.htm' },
       { text: 'IAA (RB Global) FY2024 Annual Report — acreage from property disclosures', url: 'https://investor.rbglobal.com/home/default.aspx' },
       'Manheim: estimated from location count × average site size (industry benchmark)',
       'CarMax & Carvana: estimated from facility count × average store/IRC acreage',
       'ACV Auctions & eBay Motors: digital-only — near zero physical acreage',
     ],
     countriesChart: [
-      { text: 'Copart FY2024 10-K — 11 countries: US, UK, Canada, Germany, UAE, Ireland, Finland, Spain, Bahrain, Oman, Brazil', url: 'https://corporate.copart.com/investor-relations' },
+      { text: 'Copart FY2024 10-K — 11 countries: US, UK, Canada, Germany, UAE, Ireland, Finland, Spain, Bahrain, Oman, Brazil', url: 'https://www.sec.gov/Archives/edgar/data/900075/000090007524000024/cprt-20240731.htm' },
       { text: 'RB Global (IAA) — US & Canada operations (investor presentations 2024)', url: 'https://investor.rbglobal.com/home/default.aspx' },
       'Manheim / Cox Automotive: international operations disclosures',
       { text: 'OPENLANE FY2024 Annual Report', url: 'https://ir.corporate.openlane.com/investor-relations/financials/financial-reports/default.aspx' },
@@ -1188,7 +1236,7 @@
       { text: 'eBay Inc. — international market country disclosures (Motors estimated)', url: 'https://investors.ebayinc.com/financial-information/annual-reports/default.aspx' },
     ],
     vehiclesAssignedChart: [
-      { text: 'Copart FY2024 10-K — vehicles offered/assigned at auction', url: 'https://corporate.copart.com/investor-relations' },
+      { text: 'Copart FY2024 10-K — vehicles offered/assigned at auction', url: 'https://www.sec.gov/Archives/edgar/data/900075/000090007524000024/cprt-20240731.htm' },
       { text: 'RB Global (IAA) FY2024 Annual Report', url: 'https://investor.rbglobal.com/home/default.aspx' },
       'Manheim / Cox Automotive wholesale volume estimates (industry reports)',
       { text: 'OPENLANE FY2024 Annual Report', url: 'https://ir.corporate.openlane.com/investor-relations/financials/financial-reports/default.aspx' },
@@ -1198,7 +1246,7 @@
       { text: 'eBay Inc. Annual Report — Motors active listing estimates', url: 'https://investors.ebayinc.com/financial-information/annual-reports/default.aspx' },
     ],
     vehiclesSoldChart: [
-      { text: 'Copart FY2024 10-K — units sold at auction', url: 'https://corporate.copart.com/investor-relations' },
+      { text: 'Copart FY2024 10-K — units sold at auction', url: 'https://www.sec.gov/Archives/edgar/data/900075/000090007524000024/cprt-20240731.htm' },
       { text: 'RB Global (IAA) FY2024 Annual Report', url: 'https://investor.rbglobal.com/home/default.aspx' },
       'Manheim / Cox Automotive wholesale volume estimates',
       { text: 'OPENLANE FY2024 Annual Report', url: 'https://ir.corporate.openlane.com/investor-relations/financials/financial-reports/default.aspx' },
@@ -1208,7 +1256,7 @@
       { text: 'eBay Inc. Annual Report — GMV-based Motors estimate', url: 'https://investors.ebayinc.com/financial-information/annual-reports/default.aspx' },
     ],
     inventoryChart: [
-      { text: 'Copart investor presentations & FY2024 Annual Report — 180K+ vehicles on lots', url: 'https://corporate.copart.com/investor-relations' },
+      { text: 'Copart investor presentations & FY2024 Annual Report — 180K+ vehicles on lots', url: 'https://www.sec.gov/Archives/edgar/data/900075/000090007524000024/cprt-20240731.htm' },
       { text: 'IAA (RB Global) FY2024 Annual Report', url: 'https://investor.rbglobal.com/home/default.aspx' },
       'Manheim / Cox Automotive industry volume estimates',
       { text: 'CarMax FY2025 Annual Report — vehicle inventory levels', url: 'https://investors.carmax.com/financials/financial-information/default.aspx' },
@@ -1217,7 +1265,7 @@
       'eBay Motors: active vehicle-only listings estimate',
     ],
     transportChart: [
-      { text: 'Copart investor presentations — 20,000+ contracted tow operators & dedicated fleet', url: 'https://corporate.copart.com/investor-relations' },
+      { text: 'Copart investor presentations — 20,000+ contracted tow operators & dedicated fleet', url: 'https://www.sec.gov/Archives/edgar/data/900075/000090007524000024/cprt-20240731.htm' },
       { text: 'IAA (RB Global) — Transparent Transport platform; ~10,000 contracted providers', url: 'https://investor.rbglobal.com/home/default.aspx' },
       'Manheim / Cox Automotive — Ready Logistics division; ~4,000 carrier partners',
       'OpenLane — ~500 digital broker transport partners (estimated)',
@@ -1228,7 +1276,7 @@
       { text: 'Industry context: NAAA (National Auto Auction Association)', url: 'https://www.naaa.com/' },
     ],
     titleChart: [
-      { text: 'Copart FY2024 10-K — Title Express service; ~3.2M insurance/salvage titles/year', url: 'https://corporate.copart.com/investor-relations' },
+      { text: 'Copart FY2024 10-K — Title Express service; ~3.2M insurance/salvage titles/year', url: 'https://www.sec.gov/Archives/edgar/data/900075/000090007524000024/cprt-20240731.htm' },
       { text: 'IAA (RB Global) FY2024 Annual Report — title services; ~2.1M titles/year', url: 'https://investor.rbglobal.com/home/default.aspx' },
       'Manheim / Cox Automotive — ~7M wholesale dealer-to-dealer title transfers facilitated',
       { text: 'OPENLANE FY2024 Annual Report — ~1.3M wholesale dealer title transfers', url: 'https://ir.corporate.openlane.com/investor-relations/financials/financial-reports/default.aspx' },
@@ -1238,7 +1286,7 @@
       'eBay Motors — peer-to-peer; buyer and seller manage title independently (N/A)',
     ],
     employeesChart: [
-      { text: 'Copart FY2024 10-K — approximately 16,000 employees', url: 'https://corporate.copart.com/investor-relations' },
+      { text: 'Copart FY2024 10-K — approximately 16,000 employees', url: 'https://www.sec.gov/Archives/edgar/data/900075/000090007524000024/cprt-20240731.htm' },
       { text: 'RB Global (IAA) FY2024 Annual Report', url: 'https://investor.rbglobal.com/home/default.aspx' },
       'Manheim: estimated from Cox Automotive total headcount disclosures',
       { text: 'OPENLANE FY2024 Annual Report', url: 'https://ir.corporate.openlane.com/investor-relations/financials/financial-reports/default.aspx' },
@@ -1300,7 +1348,7 @@
       'No company publicly discloses exact download figures; estimates are directional',
     ],
     buyersChart: [
-      { text: 'Copart FY2024 investor disclosures — 750,000+ registered global members', url: 'https://corporate.copart.com/investor-relations' },
+      { text: 'Copart FY2024 investor disclosures — 750,000+ registered global members', url: 'https://www.sec.gov/Archives/edgar/data/900075/000090007524000024/cprt-20240731.htm' },
       { text: 'IAA (RB Global) investor presentations — registered buyer account count', url: 'https://investor.rbglobal.com/home/default.aspx' },
       'Manheim: dealer-only access; registered dealer buyer estimate from industry reports',
       { text: 'OPENLANE FY2024 Annual Report — registered dealer buyer count', url: 'https://ir.corporate.openlane.com/investor-relations/financials/financial-reports/default.aspx' },
@@ -1308,7 +1356,7 @@
       'CarMax, Carvana, eBay Motors: B2C retail models — metric not comparable (N/A)',
     ],
     buyerCountriesChart: [
-      { text: 'Copart FY2024 investor disclosures — buyers from 170+ countries', url: 'https://corporate.copart.com/investor-relations' },
+      { text: 'Copart FY2024 investor disclosures — buyers from 170+ countries', url: 'https://www.sec.gov/Archives/edgar/data/900075/000090007524000024/cprt-20240731.htm' },
       { text: 'IAA (RB Global) investor presentations — international buyer reach', url: 'https://investor.rbglobal.com/home/default.aspx' },
       'Manheim, OpenLane, ACV: international buyer estimates from company disclosures',
       'CarMax, Carvana: US-only retail operations (1 country each)',
@@ -1328,7 +1376,7 @@
       'CarMax, Carvana, eBay Motors excluded — consumer brand traffic dominates for these companies',
     ],
     youtubeChart: [
-      { text: 'Copart — official YouTube channel', url: 'https://www.youtube.com/@Copart' },
+      { text: 'Copart — official YouTube channel', url: 'https://www.youtube.com/@CopartTV' },
       { text: 'IAA Auctions — official YouTube channel', url: 'https://www.youtube.com/@IAAauctions' },
       { text: 'Manheim — official YouTube channel', url: 'https://www.youtube.com/@Manheim' },
       { text: 'OPENLANE — official YouTube channel', url: 'https://www.youtube.com/@OPENLANE' },
@@ -1397,25 +1445,95 @@
     return arr.map(v => (v == null || v === 0) ? 0 : parseFloat((v / mx * 10).toFixed(1)));
   };
 
-  const radarAxes = {
-    'Mkt Cap':         norm([54, 8, 0, 1.1, 1.4, 11, 49, 0]),
-    'Locations':       norm([260, 200, 75, 30, 0, 246, 33, 0]),
-    'Land Acreage':    norm([120, 30, 14, 4, 0, 5, 2, 0]),
-    'Countries':       norm([11, 2, 4, 3, 2, 1, 1, 15]),
-    'Vehicles Sold':   norm([3.5, 2.2, 8.5, 1.3, 0.55, 0.9, 0.42, 2.0]),
-    'App Rating':      norm([4.8, 4.3, 3.9, 3.7, 4.6, 4.8, 4.8, 4.4]),
-    'App Downloads':   norm([5, 2, 1, 0.5, 1, 10, 8, 5]),
-    'Glassdoor':       norm([3.9, 3.4, 3.7, 3.5, 3.9, 3.9, 3.3, 3.8]),
-    'Reg Buyers':      norm([750, 500, 70, 85, 25, 0, 0, 0]),
-    'Buyer Countries': norm([170, 40, 25, 20, 3, 1, 1, 65]),
-    'Social Mentions': norm([45, 25, 35, 8, 12, 180, 280, 55]),
+  // ── ALL POSSIBLE RADAR AXES (25 metrics) ──
+  const ALL_RADAR_AXES_DEF = {
+    'Revenue':          norm([4.19, 4.06, 4.50, 0.91, 0.63, 26.50, 13.70, 1.80]),
+    'Mkt Cap':          norm([54, 8, 0, 1.1, 1.4, 11, 49, 0]),
+    'CapEx':            norm([1.1, 0.22, 0, 0.065, 0.04, 0.38, 0.35, 0]),
+    'Locations':        norm([270, 200, 75, 30, 0, 246, 36, 0]),
+    'Land Acreage':     norm([120, 30, 14, 4, 0, 5, 2, 0]),
+    'Countries':        norm([11, 2, 4, 3, 2, 1, 1, 15]),
+    'Veh. Auctioned':   norm([3.6, 2.4, 10.0, 1.6, 0.6, 0.95, 0.45, 3.0]),
+    'Veh. Sold':        norm([3.5, 2.2, 8.5, 1.3, 0.55, 0.90, 0.42, 2.0]),
+    'Daily Inventory':  norm([180, 125, 85, 55, 18, 55, 40, 35]),
+    'Tow Network':      norm([20, 10, 4, 0.5, 1, 1, 2, 0]),
+    'Title Processing': norm([3.2, 2.1, 7.0, 1.3, 0.55, 1.8, 0.8, 0]),
+    'Employees':        norm([16, 7, 20, 2.2, 1.7, 28, 15, 0]),
+    'Glassdoor':        norm([3.9, 3.4, 3.7, 3.5, 3.9, 3.9, 3.3, 3.8]),
+    'Years in Op':      norm([42, 43, 79, 35, 10, 31, 12, 25]),
+    'App Rating':       norm([4.8, 4.3, 3.9, 3.7, 4.6, 4.8, 4.8, 4.4]),
+    'App Downloads':    norm([5, 2, 1, 0.5, 1, 10, 8, 5]),
+    'Driver Rating':    norm([4.5, 4.0, 3.8, 0, 4.2, 4.3, 4.5, 0]),
+    'Driver Downloads': norm([1.0, 0.5, 0.3, 0, 0.4, 0.8, 1.2, 0]),
+    'Reg. Buyers':      norm([750, 500, 70, 85, 25, 0, 0, 0]),
+    'Buyer Countries':  norm([170, 40, 25, 20, 3, 1, 1, 65]),
+    'Social Mentions':  norm([45, 25, 35, 8, 12, 180, 280, 55]),
+    'B2B Mentions':     norm([45, 25, 35, 8, 12, 0, 0, 55]),
+    'YouTube Subs':     norm([90, 20, 25, 7, 4, 115, 60, 47]),
+    'YT Mentions':      norm([8, 4, 6, 1.5, 2, 95, 120, 18]),
+    'SEM Spend':        norm([1.1, 0.6, 0.75, 0.35, 0.45, 11.5, 15.0, 5.0]),
   };
+  const DEFAULT_RADAR_KEYS = new Set(['Mkt Cap','Locations','Land Acreage','Countries','Veh. Sold','App Rating','App Downloads','Glassdoor','Reg. Buyers','Buyer Countries','Social Mentions']);
+  let selectedRadarMetrics = new Set(DEFAULT_RADAR_KEYS);
+
+  function getActiveRadarAxes() {
+    const out = {};
+    for (const [k, v] of Object.entries(ALL_RADAR_AXES_DEF)) {
+      if (selectedRadarMetrics.has(k)) out[k] = v;
+    }
+    return out;
+  }
+
+  // Build radar metric filter buttons
+  function buildRadarMetricFilter() {
+    const container = document.getElementById('radarMetricFilter');
+    container.innerHTML = '';
+    Object.keys(ALL_RADAR_AXES_DEF).forEach(key => {
+      const btn = document.createElement('button');
+      btn.className = 'rmf-btn' + (selectedRadarMetrics.has(key) ? ' on' : '');
+      btn.textContent = key;
+      btn.addEventListener('click', () => {
+        if (selectedRadarMetrics.has(key)) {
+          if (selectedRadarMetrics.size <= 3) return; // keep minimum 3 axes
+          selectedRadarMetrics.delete(key);
+        } else {
+          if (selectedRadarMetrics.size >= 14) return; // cap at 14 for readability
+          selectedRadarMetrics.add(key);
+        }
+        btn.classList.toggle('on', selectedRadarMetrics.has(key));
+        const n = selectedRadarMetrics.size;
+        document.getElementById('radarTitle').textContent = `Web Chart — 8 Competitors · ${n} Dimension${n !== 1 ? 's' : ''}`;
+        rebuildRadar();
+      });
+      container.appendChild(btn);
+    });
+    const reset = document.createElement('button');
+    reset.className = 'rmf-reset';
+    reset.textContent = '↺ Reset';
+    reset.addEventListener('click', () => {
+      selectedRadarMetrics = new Set(DEFAULT_RADAR_KEYS);
+      container.querySelectorAll('.rmf-btn').forEach((b, i) => {
+        b.classList.toggle('on', selectedRadarMetrics.has(b.textContent));
+      });
+      document.getElementById('radarTitle').textContent = `Web Chart — 8 Competitors · ${DEFAULT_RADAR_KEYS.size} Dimensions`;
+      rebuildRadar();
+    });
+    container.appendChild(reset);
+  }
+
+  function rebuildRadar() {
+    if (CR['radarChart']?.chart) {
+      CR['radarChart'].chart.destroy();
+      CR['radarChart'].chart = new Chart(document.getElementById('radarChart'), buildRadarCfg(filterIndices));
+    }
+  }
 
   function buildRadarCfg(hiddenSet, forMax = false) {
     const light = isLight();
     const gridCol = light ? 'rgba(203,213,225,0.65)' : 'rgba(26,46,74,0.7)';
     const labelCol = light ? '#64748b' : '#94a3b8';
     const tipBg = light ? '#1e293b' : '#0d1b30';
+    const radarAxes = getActiveRadarAxes();
     return {
       type: 'radar',
       data: {
@@ -1461,6 +1579,133 @@
     currentType: 'radar',
     recreate: (canvasId) => new Chart(document.getElementById(canvasId), buildRadarCfg(filterIndices))
   };
+
+  buildRadarMetricFilter();
+
+  // ══ BUBBLE CHART ══
+  const BUBBLE_DIMS = [
+    { id: 'scale-reach',   label: 'Scale vs. Reach vs. Revenue',        x: 'Locations', y: 'Reg. Buyers', r: 'Revenue' },
+    { id: 'phys-mkt',      label: 'Physical vs. Marketplace Depth',     x: 'Land Acreage', y: 'Buyer Countries', r: 'Mkt Cap' },
+    { id: 'digital-vol',   label: 'Digital vs. Volume vs. CapEx',       x: 'App Downloads', y: 'Veh. Sold', r: 'CapEx' },
+    { id: 'inv-buyers',    label: 'Daily Inventory vs. Buyers vs. Revenue', x: 'Daily Inventory', y: 'Reg. Buyers', r: 'Revenue' },
+  ];
+
+  const BUBBLE_RAW = {
+    'Revenue':         [4.19, 4.06, 4.50, 0.91, 0.63, 26.50, 13.70, 1.80],
+    'Mkt Cap':         [54,   8,    null,  1.1,  1.4,  11,   49,   null],
+    'CapEx':           [1.1,  0.22, null,  0.065,0.04, 0.38, 0.35, null],
+    'Locations':       [270,  200,  75,   30,   0,    246,  36,   0],
+    'Land Acreage':    [120,  30,   14,   4,    0,    5,    2,    0],
+    'Veh. Sold':       [3.5,  2.2,  8.5,  1.3,  0.55, 0.90, 0.42, 2.0],
+    'Daily Inventory': [180,  125,  85,   55,   18,   55,   40,   35],
+    'App Downloads':   [5,    2,    1,    0.5,  1,    10,   8,    5],
+    'Reg. Buyers':     [750,  500,  70,   85,   25,   null, null, null],
+    'Buyer Countries': [170,  40,   25,   20,   3,    1,    1,    65],
+  };
+
+  const BUBBLE_UNITS = {
+    'Revenue': '$B', 'Mkt Cap': '$B', 'CapEx': '$B', 'Locations': 'sites',
+    'Land Acreage': 'K acres', 'Veh. Sold': 'M/yr', 'Daily Inventory': 'K vehicles',
+    'App Downloads': 'M dl', 'Reg. Buyers': 'K members', 'Buyer Countries': 'countries',
+  };
+
+  let activeBubbleDim = 0;
+  let bubbleChartInst = null;
+
+  function buildBubbleCfg(dimIdx) {
+    const dim = BUBBLE_DIMS[dimIdx];
+    const xArr = BUBBLE_RAW[dim.x];
+    const yArr = BUBBLE_RAW[dim.y];
+    const rArr = BUBBLE_RAW[dim.r];
+    const rMax = Math.max(...rArr.filter(v => v != null));
+    const light = isLight();
+    const gridCol = light ? 'rgba(203,213,225,0.6)' : 'rgba(26,46,74,0.55)';
+    const tickCol = light ? '#64748b' : '#64748b';
+    const tipBg   = light ? '#1e293b' : '#0d1b30';
+
+    const datasets = CO.map((name, i) => {
+      const xv = xArr[i], yv = yArr[i], rv = rArr[i];
+      if (xv == null || yv == null || rv == null) return null;
+      const rPx = Math.max(6, Math.round((rv / rMax) * 42));
+      return {
+        label: name,
+        data: [{ x: xv, y: yv, r: rPx }],
+        backgroundColor: BG[i],
+        borderColor: BD[i],
+        borderWidth: i === 0 ? 3 : 1.5,
+        _rawR: rv,
+      };
+    }).filter(Boolean);
+
+    return {
+      type: 'bubble',
+      data: { datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        layout: { padding: 20 },
+        plugins: {
+          legend: { position: 'bottom', labels: { color: light ? '#475569' : '#94a3b8', font: { size: 10.5 }, padding: 14, boxWidth: 11, boxHeight: 11 } },
+          tooltip: {
+            backgroundColor: tipBg, borderColor: '#1a2e4a', borderWidth: 1,
+            titleColor: '#e2e8f0', bodyColor: '#94a3b8', padding: 12,
+            callbacks: {
+              title: ctx => ctx[0].dataset.label,
+              label: ctx => {
+                const ds = ctx.dataset;
+                const pt = ctx.raw;
+                return [
+                  `  ${dim.x}: ${pt.x} ${BUBBLE_UNITS[dim.x]}`,
+                  `  ${dim.y}: ${pt.y} ${BUBBLE_UNITS[dim.y]}`,
+                  `  ${dim.r}: ${ds._rawR} ${BUBBLE_UNITS[dim.r]}`,
+                ];
+              }
+            }
+          },
+          datalabels: {
+            anchor: 'center', align: 'center', clip: false,
+            color: '#fff', font: { size: 9, weight: '700' },
+            formatter: (val, ctx) => ctx.dataset.label.split(' ')[0],
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: gridCol }, ticks: { color: tickCol, font: { size: 9.5 } }, border: { color: '#1a2e4a' },
+            title: { display: true, text: `${dim.x} (${BUBBLE_UNITS[dim.x]})`, color: '#475569', font: { size: 9.5, weight: '500' } }
+          },
+          y: {
+            grid: { color: gridCol }, ticks: { color: tickCol, font: { size: 9.5 } }, border: { color: '#1a2e4a' },
+            title: { display: true, text: `${dim.y} (${BUBBLE_UNITS[dim.y]})`, color: '#475569', font: { size: 9.5, weight: '500' } },
+            min: 0
+          }
+        },
+        animation: { duration: 700, easing: 'easeOutQuart' }
+      }
+    };
+  }
+
+  function switchBubbleDim(idx, btn) {
+    document.querySelectorAll('.bubble-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeBubbleDim = idx;
+    if (bubbleChartInst) { bubbleChartInst.destroy(); }
+    bubbleChartInst = new Chart(document.getElementById('bubbleChart'), buildBubbleCfg(idx));
+    document.querySelector('.bubble-hd-text p').textContent =
+      `Each bubble = one competitor. ${BUBBLE_DIMS[idx].x} (X-axis) · ${BUBBLE_DIMS[idx].y} (Y-axis) · Bubble Size = ${BUBBLE_DIMS[idx].r}. Companies with null values omitted.`;
+  }
+
+  function buildBubbleControls() {
+    const container = document.getElementById('bubbleControls');
+    BUBBLE_DIMS.forEach((dim, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'bubble-btn' + (i === 0 ? ' active' : '');
+      btn.textContent = dim.label;
+      btn.addEventListener('click', () => switchBubbleDim(i, btn));
+      container.appendChild(btn);
+    });
+  }
+
+  buildBubbleControls();
+  bubbleChartInst = new Chart(document.getElementById('bubbleChart'), buildBubbleCfg(0));
 
   // ══ FILTER ══
   function applyFilter(type) {
@@ -1511,6 +1756,10 @@
         entry.chart = new Chart(document.getElementById(id), buildForType(id, entry.currentType || 'bar'));
       }
     });
+    if (bubbleChartInst) {
+      bubbleChartInst.destroy();
+      bubbleChartInst = new Chart(document.getElementById('bubbleChart'), buildBubbleCfg(activeBubbleDim));
+    }
   }
 
   // ══ MAXIMIZE ══

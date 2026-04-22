@@ -62,7 +62,7 @@
       color: #60a5fa; font-size: 10px; font-weight: 800; letter-spacing: 2.5px;
       text-transform: uppercase; padding: 5px 16px; border-radius: 100px; margin-bottom: 28px;
     }
-    .hero-eyebrow span { width: 6px; height: 6px; border-radius: 50%; background: #3b82f6; }
+    .hero-eyebrow span { display: none; }
     .hero h1 { font-size: clamp(2.2rem, 5vw, 4rem); font-weight: 900; letter-spacing: -2px; line-height: 1.08; color: #fff; margin-bottom: 16px; }
     .hero h1 em { color: #3b82f6; font-style: normal; }
     .hero-sub { font-size: 1.1rem; color: var(--muted); max-width: 620px; margin: 0 auto 48px; line-height: 1.65; }
@@ -78,7 +78,6 @@
       border-right: 1px solid rgba(0,71,187,0.2); background: rgba(0,71,187,0.1);
     }
     .punch-item:last-child { border-right: none; }
-    .punch-icon { font-size: 1.6rem; margin-bottom: 8px; }
     .punch-label { font-size: 0.7rem; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase; color: #60a5fa; }
     .punch-desc { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; line-height: 1.4; }
 
@@ -120,12 +119,11 @@
       margin-top: 24px;
       background: rgba(0,71,187,0.1); border: 1px solid rgba(0,71,187,0.3);
       border-left: 3px solid #0047bb; border-radius: 0 12px 12px 0;
-      padding: 18px 22px; display: flex; align-items: flex-start; gap: 14px;
+      padding: 18px 22px;
     }
     .takeaway.green { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.3); border-left-color: #10b981; }
     .takeaway.purple { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.3); border-left-color: #8b5cf6; }
     .takeaway.gold { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.3); border-left-color: #f59e0b; }
-    .takeaway-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
     .takeaway-title { font-size: 0.72rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #60a5fa; margin-bottom: 5px; }
     .takeaway.green .takeaway-title { color: #34d399; }
     .takeaway.purple .takeaway-title { color: #a78bfa; }
@@ -337,23 +335,19 @@
   <p class="hero-sub">This is why Copart's scale translates directly into better claim economics for insurance carriers — faster cycle times, maximum recovery values, and reliability when it matters most.</p>
   <div class="punchline">
     <div class="punch-item">
-      <div class="punch-icon">🏗️</div>
-      <div class="punch-label">Physical Scale</div>
+<div class="punch-label">Physical Scale</div>
       <div class="punch-desc">Handle any volume, anywhere</div>
     </div>
     <div class="punch-item">
-      <div class="punch-icon">🌍</div>
-      <div class="punch-label">Marketplace Scale</div>
+<div class="punch-label">Marketplace Scale</div>
       <div class="punch-desc">Maximum recovery per vehicle</div>
     </div>
     <div class="punch-item">
-      <div class="punch-icon">📱</div>
-      <div class="punch-label">Digital Scale</div>
+<div class="punch-label">Digital Scale</div>
       <div class="punch-desc">Faster sales, better pricing</div>
     </div>
     <div class="punch-item">
-      <div class="punch-icon">💰</div>
-      <div class="punch-label">CapEx Commitment</div>
+<div class="punch-label">CapEx Commitment</div>
       <div class="punch-desc">Built reliability, hard to replicate</div>
     </div>
   </div>
@@ -405,7 +399,6 @@
     </div>
 
     <div class="takeaway">
-      <div class="takeaway-icon">🚛</div>
       <div>
         <div class="takeaway-title">Carrier Takeaway — Physical Scale</div>
         <div class="takeaway-body">Copart's footprint means no pickup delays, no storage bottlenecks, and no auctioning backlog — even when a single storm generates 10,000 total losses in 72 hours. With 20,000+ contracted tow operators and 270 lots, your vehicles are picked up, stored, and listed within days, not weeks.</div>
@@ -461,7 +454,6 @@
     </div>
 
     <div class="takeaway green">
-      <div class="takeaway-icon">💹</div>
       <div>
         <div class="takeaway-title">Carrier Takeaway — Marketplace Scale</div>
         <div class="takeaway-body">Every vehicle you consign enters a global auction with 750,000+ potential bidders. A German dealer, a West African exporter, and a US dismantler all compete simultaneously — that competition is what maximises your salvage recovery. Copart's 97% sell-through rate means your vehicle doesn't sit, it sells.</div>
@@ -512,7 +504,6 @@
     </div>
 
     <div class="takeaway purple">
-      <div class="takeaway-icon">⚡</div>
       <div>
         <div class="takeaway-title">Carrier Takeaway — Digital Scale</div>
         <div class="takeaway-body">A top-rated, widely-downloaded buyer app means faster bid activity, real-time price signals, and a platform buyers actually use. Faster digital engagement = faster auction close = faster cycle time = less daily depreciation on your claims portfolio. Every day a total loss sits unsold costs your claim economics money.</div>
@@ -558,7 +549,6 @@
     </div>
 
     <div class="takeaway gold">
-      <div class="takeaway-icon">🏦</div>
       <div>
         <div class="takeaway-title">Carrier Takeaway — CapEx &amp; Reliability</div>
         <div class="takeaway-body">High CapEx means continued expansion of the physical and digital infrastructure your claims depend on. Competitors with low CapEx are managing existing assets; Copart is building future capacity. In CAT event scenarios — when your volume surges 5–10× overnight — you need a partner who has already invested in the capacity to absorb it.</div>
@@ -597,7 +587,6 @@
     </div>
 
     <div class="takeaway" style="margin-top:28px;">
-      <div class="takeaway-icon">🎯</div>
       <div>
         <div class="takeaway-title">The Integrated Scale Advantage</div>
         <div class="takeaway-body">Physical-only players are bottlenecked by buyer depth. Digital-only players are bottlenecked by storage and logistics. Only integrated players can promise: your vehicle is picked up fast, stored safely, listed broadly, and sold at maximum value. That combination is what differentiates claim economics — not any single metric in isolation.</div>

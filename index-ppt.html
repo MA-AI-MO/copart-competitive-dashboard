@@ -69,12 +69,12 @@
       color: #F17118; font-size: 10px; font-weight: 700; letter-spacing: 2px;
       text-transform: uppercase; padding: 4px 13px; border-radius: 100px; margin-bottom: 18px;
     }
-    .hdr-pill span { width: 5px; height: 5px; border-radius: 50%; background: #F17118; }
+    .hdr-pill span { display: none; }
     header h1 {
       font-size: clamp(1.85rem, 3.5vw, 2.9rem); font-weight: 900; letter-spacing: -1.2px;
       line-height: 1.1; color: #fff; margin-bottom: 8px;
     }
-    header h1 em { color: #0047BB; font-style: normal; }
+    header h1 em { color: #2662D9; font-style: normal; }
     .hdr-sub { font-size: 0.9rem; color: rgba(255,255,255,0.6); max-width: 560px; margin-bottom: 28px; line-height: 1.55; }
     .stat-strip {
       display: flex; gap: 0; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px;
@@ -115,7 +115,7 @@
     main { padding: 0 40px 60px; max-width: 1440px; margin: 0 auto; }
     .sec-label {
       font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-      color: #0047BB; padding: 26px 0 10px;
+      color: #2662D9; padding: 26px 0 10px;
       border-bottom: 1px solid var(--border); margin-bottom: 14px;
     }
     .g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
@@ -127,13 +127,13 @@
     .card:hover { box-shadow: 0 2px 10px rgba(15,39,87,0.08); }
     .card-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 3px; }
     .card-hd-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-    .card-title { font-size: 0.85rem; font-weight: 700; color: #0047BB; }
+    .card-title { font-size: 0.85rem; font-weight: 700; color: #2662D9; }
     .card-sub { font-size: 0.67rem; color: var(--muted); margin-bottom: 8px; line-height: 1.45; }
     .card-filter-badge {
       display: none; margin-bottom: 8px;
       font-size: 0.59rem; font-weight: 700; letter-spacing: 0.4px;
-      color: #0047BB; background: rgba(0,71,187,0.07);
-      border: 1px solid rgba(0,71,187,0.2); border-radius: 100px;
+      color: #2662D9; background: rgba(38,98,217,0.07);
+      border: 1px solid rgba(38,98,217,0.2); border-radius: 100px;
       padding: 2px 9px; width: fit-content;
     }
     .card-filter-badge.visible { display: inline-block; }
@@ -167,7 +167,7 @@
       padding: 22px; margin-bottom: 14px;
     }
     .radar-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
-    .radar-hd-text h2 { font-size: 1.05rem; font-weight: 800; color: #0047BB; }
+    .radar-hd-text h2 { font-size: 1.05rem; font-weight: 800; color: #2662D9; }
     .radar-hd-text p { font-size: 0.69rem; color: var(--muted); margin-top: 3px; }
     .radar-metric-filter { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
     .rmf-btn {
@@ -192,7 +192,7 @@
       padding: 22px; margin-bottom: 14px;
     }
     .bubble-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-    .bubble-hd-text h2 { font-size: 1.05rem; font-weight: 800; color: #0047BB; }
+    .bubble-hd-text h2 { font-size: 1.05rem; font-weight: 800; color: #2662D9; }
     .bubble-hd-text p { font-size: 0.69rem; color: var(--muted); margin-top: 3px; }
     .bubble-controls { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 10px; }
     .bubble-btn {
@@ -234,7 +234,7 @@
       display: flex; align-items: center; justify-content: space-between;
       padding: 15px 20px; border-bottom: 1px solid var(--border);
     }
-    .modal-hdr h3 { font-size: 0.95rem; font-weight: 700; color: var(--navy); }
+    .modal-hdr h3 { font-size: 0.95rem; font-weight: 700; color: #2662D9; }
     .modal-close { background: none; border: none; font-size: 1.05rem; color: var(--muted); cursor: pointer; transition: color 0.14s; }
     .modal-close:hover { color: var(--text); }
     .modal-body { padding: 10px 8px; max-height: 420px; overflow-y: auto; }
@@ -287,7 +287,7 @@
       padding: 14px 20px; border-bottom: 1px solid var(--border);
     }
     .max-hd-text { display: flex; flex-direction: column; gap: 3px; }
-    .max-title { font-size: 0.95rem; font-weight: 700; color: var(--navy); }
+    .max-title { font-size: 0.95rem; font-weight: 700; color: #2662D9; }
     .max-sub { font-size: 0.69rem; color: var(--muted); }
     .max-body { flex: 1; overflow: hidden; padding: 18px; }
     .max-cw { height: 100%; min-height: 400px; }
@@ -368,12 +368,12 @@
     <span class="filter-hint" id="filterHint">IAA · Manheim · OpenLane · ACV are Primary &nbsp;|&nbsp; CarMax · Carvana · eBay Motors are Secondary</span>
   </div>
   <div class="legend-items">
-    <div class="legend-item hi"><div class="legend-dot" style="background:#063598"></div>Copart</div>
+    <div class="legend-item hi"><div class="legend-dot" style="background:#2662D9"></div>Copart</div>
     <div class="legend-item"><div class="legend-dot" style="background:#D42A54"></div>IAA (RB Global)</div>
     <div class="legend-item"><div class="legend-dot" style="background:#F17118"></div>Manheim</div>
     <div class="legend-item"><div class="legend-dot" style="background:#007970"></div>OpenLane</div>
     <div class="legend-item"><div class="legend-dot" style="background:#7B38B3"></div>ACV Auctions</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#2662D9"></div>CarMax</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#0891B2"></div>CarMax</div>
     <div class="legend-item"><div class="legend-dot" style="background:#4CA830"></div>Carvana</div>
     <div class="legend-item"><div class="legend-dot" style="background:#EC9C0D"></div>eBay Motors</div>
   </div>
@@ -722,16 +722,16 @@
   const CO = ['Copart','IAA','Manheim','OpenLane','ACV','CarMax','Carvana','eBay Motors'];
   // PPT-aligned competitor colors (from Copart design system color palette)
   const BG = [
-    'rgba(6,53,152,0.85)',   // Copart — blue #063598
+    'rgba(38,98,217,0.85)',  // Copart — blue #2662D9
     'rgba(212,42,84,0.75)',  // IAA — rose #D42A54
     'rgba(241,113,24,0.78)', // Manheim — orange #F17118
     'rgba(0,121,112,0.78)',  // OpenLane — teal #007970
     'rgba(123,56,179,0.78)', // ACV — purple #7B38B3
-    'rgba(38,98,217,0.75)',  // CarMax — mid blue #2662D9
+    'rgba(8,145,178,0.78)',  // CarMax — teal #0891B2
     'rgba(76,168,48,0.78)',  // Carvana — green #4CA830
     'rgba(236,156,13,0.82)', // eBay Motors — amber #EC9C0D
   ];
-  const BD = ['#063598','#D42A54','#F17118','#007970','#7B38B3','#2662D9','#4CA830','#EC9C0D'];
+  const BD = ['#2662D9','#D42A54','#F17118','#007970','#7B38B3','#0891B2','#4CA830','#EC9C0D'];
 
   const ALL_IDX       = [0,1,2,3,4,5,6,7];
   const PRIMARY_IDX   = [0,1,2,3,4];
@@ -758,7 +758,7 @@
     const aStyle   = axisStyle(forMax);
     return {
       type: 'bar',
-      data: { labels, datasets: [{ data: dispData, _rawData: rawData, backgroundColor: dispBg, borderColor: dispBd, borderWidth: dispBw, borderRadius: 5, borderSkipped: false }] },
+      data: { labels, datasets: [{ data: dispData, _rawData: rawData, backgroundColor: dispBg, borderColor: dispBd, borderWidth: dispBw, borderRadius: 0, borderSkipped: false }] },
       options: {
         responsive: true, maintainAspectRatio: false,
         layout: { padding: { top: 26, right: 6 } },
@@ -830,7 +830,7 @@
     const aStyle   = axisStyle(forMax);
     return {
       type: 'bar',
-      data: { labels, datasets: [{ data: dispData, _rawData: rawData, backgroundColor: dispBg, borderColor: dispBd, borderWidth: dispBw, borderRadius: 4, borderSkipped: false }] },
+      data: { labels, datasets: [{ data: dispData, _rawData: rawData, backgroundColor: dispBg, borderColor: dispBd, borderWidth: dispBw, borderRadius: 0, borderSkipped: false }] },
       options: {
         indexAxis: 'y',
         responsive: true, maintainAspectRatio: false,
@@ -1036,7 +1036,7 @@
           label: name,
           data: Object.values(radarAxes).map(m => m[i]),
           hidden: hiddenSet ? !hiddenSet.includes(i) : false,
-          backgroundColor: i === 0 ? 'rgba(6,53,152,0.15)' : BG[i].replace(/[\d.]+\)$/, '0.04)'),
+          backgroundColor: i === 0 ? 'rgba(38,98,217,0.15)' : BG[i].replace(/[\d.]+\)$/, '0.04)'),
           borderColor: BD[i],
           borderWidth: i === 0 ? 3 : 1.5,
           pointBackgroundColor: BD[i],

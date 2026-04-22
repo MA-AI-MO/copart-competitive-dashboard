@@ -77,7 +77,7 @@
       color: var(--orange); font-size: 10px; font-weight: 700; letter-spacing: 2.5px;
       text-transform: uppercase; padding: 5px 16px; border-radius: 100px; margin-bottom: 28px;
     }
-    .hero-eyebrow span { width: 5px; height: 5px; border-radius: 50%; background: var(--orange); }
+    .hero-eyebrow span { display: none; }
     .hero h1 {
       font-size: clamp(2rem, 4.5vw, 3.6rem); font-weight: 900; letter-spacing: -1.5px;
       line-height: 1.1; color: #fff; margin-bottom: 16px;
@@ -102,7 +102,6 @@
     }
     .punch-item:hover { background: rgba(255,255,255,0.08); }
     .punch-item:last-child { border-right: none; }
-    .punch-icon { font-size: 1.5rem; margin-bottom: 8px; }
     .punch-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--orange); }
     .punch-desc { font-size: 0.76rem; color: rgba(255,255,255,0.55); margin-top: 5px; line-height: 1.4; }
 
@@ -116,12 +115,12 @@
       font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
       padding: 4px 13px; border-radius: 100px; margin-bottom: 14px;
     }
-    .chapter-tag.physical  { background: rgba(6,53,152,0.1);  color: #0047BB;  border: 1px solid rgba(6,53,152,0.25); }
+    .chapter-tag.physical  { background: rgba(38,98,217,0.1);  color: #2662D9;  border: 1px solid rgba(38,98,217,0.25); }
     .chapter-tag.marketplace { background: rgba(76,168,48,0.1); color: var(--success); border: 1px solid rgba(76,168,48,0.25); }
     .chapter-tag.digital   { background: rgba(123,56,179,0.1); color: #7B38B3;       border: 1px solid rgba(123,56,179,0.25); }
     .chapter-tag.capex     { background: rgba(236,156,13,0.1); color: var(--gold);   border: 1px solid rgba(236,156,13,0.25); }
     .chapter-tag.insight   { background: rgba(15,39,87,0.07);  color: var(--navy);   border: 1px solid rgba(15,39,87,0.18); }
-    .chapter h2 { font-size: clamp(1.4rem, 2.8vw, 2rem); font-weight: 800; letter-spacing: -0.5px; color: #0047BB; margin-bottom: 10px; }
+    .chapter h2 { font-size: clamp(1.4rem, 2.8vw, 2rem); font-weight: 800; letter-spacing: -0.5px; color: #2662D9; margin-bottom: 10px; }
     .chapter-intro { font-size: 0.95rem; color: var(--text2); max-width: 700px; line-height: 1.65; margin-bottom: 28px; }
 
     /* ── CARDS ── */
@@ -134,7 +133,7 @@
     }
     .card:hover { box-shadow: 0 3px 12px rgba(15,39,87,0.09); }
     .card.hi { border-color: var(--border2); }
-    .card-title { font-size: 0.85rem; font-weight: 700; color: #0047BB; margin-bottom: 3px; }
+    .card-title { font-size: 0.85rem; font-weight: 700; color: #2662D9; margin-bottom: 3px; }
     .card-sub { font-size: 0.66rem; color: var(--muted); margin-bottom: 14px; line-height: 1.45; }
     .cw { position: relative; height: 220px; width: 100%; }
     .grid3 .cw { height: 200px; }
@@ -142,15 +141,14 @@
     /* ── TAKEAWAY BOX ── */
     .takeaway {
       margin-top: 22px;
-      background: rgba(6,53,152,0.05); border: 1px solid rgba(6,53,152,0.18);
+      background: rgba(38,98,217,0.05); border: 1px solid rgba(38,98,217,0.18);
       border-left: 3px solid var(--blue8); border-radius: 0 8px 8px 0;
-      padding: 18px 22px; display: flex; align-items: flex-start; gap: 14px;
+      padding: 18px 22px;
     }
     .takeaway.green  { background: rgba(76,168,48,0.06);   border-color: rgba(76,168,48,0.22);  border-left-color: var(--success); }
     .takeaway.purple { background: rgba(123,56,179,0.06);  border-color: rgba(123,56,179,0.2);  border-left-color: #7B38B3; }
     .takeaway.gold   { background: rgba(236,156,13,0.07);  border-color: rgba(236,156,13,0.22); border-left-color: var(--gold); }
-    .takeaway-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
-    .takeaway-title { font-size: 0.68rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #0047BB; margin-bottom: 5px; }
+    .takeaway-title { font-size: 0.68rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #2662D9; margin-bottom: 5px; }
     .takeaway.green  .takeaway-title { color: var(--success); }
     .takeaway.purple .takeaway-title { color: #7B38B3; }
     .takeaway.gold   .takeaway-title { color: var(--gold); }
@@ -168,7 +166,7 @@
     .stat-box.purple { border-top-color: #7B38B3; }
     .stat-box.gold   { border-top-color: var(--gold); }
     .stat-val { font-size: 1.85rem; font-weight: 900; color: var(--navy); letter-spacing: -1px; line-height: 1; }
-    .stat-val.blue   { color: #0047BB; }
+    .stat-val.blue   { color: #2662D9; }
     .stat-val.green  { color: var(--success); }
     .stat-val.purple { color: #7B38B3; }
     .stat-val.gold   { color: var(--gold); }
@@ -299,23 +297,19 @@
   <p class="hero-sub">This is why Copart's scale translates directly into better claim economics for insurance carriers — faster cycle times, maximum recovery values, and reliability when it matters most.</p>
   <div class="punchline">
     <div class="punch-item">
-      <div class="punch-icon">🏗️</div>
-      <div class="punch-label">Physical Scale</div>
+<div class="punch-label">Physical Scale</div>
       <div class="punch-desc">Handle any volume, anywhere</div>
     </div>
     <div class="punch-item">
-      <div class="punch-icon">🌍</div>
-      <div class="punch-label">Marketplace Scale</div>
+<div class="punch-label">Marketplace Scale</div>
       <div class="punch-desc">Maximum recovery per vehicle</div>
     </div>
     <div class="punch-item">
-      <div class="punch-icon">📱</div>
-      <div class="punch-label">Digital Scale</div>
+<div class="punch-label">Digital Scale</div>
       <div class="punch-desc">Faster sales, better pricing</div>
     </div>
     <div class="punch-item">
-      <div class="punch-icon">💰</div>
-      <div class="punch-label">CapEx Commitment</div>
+<div class="punch-label">CapEx Commitment</div>
       <div class="punch-desc">Built reliability, hard to replicate</div>
     </div>
   </div>
@@ -367,7 +361,6 @@
     </div>
 
     <div class="takeaway">
-      <div class="takeaway-icon">🚛</div>
       <div>
         <div class="takeaway-title">Carrier Takeaway — Physical Scale</div>
         <div class="takeaway-body">Copart's footprint means no pickup delays, no storage bottlenecks, and no auctioning backlog — even when a single storm generates 10,000 total losses in 72 hours. With 20,000+ contracted tow operators and 270 lots, your vehicles are picked up, stored, and listed within days, not weeks.</div>
@@ -423,7 +416,6 @@
     </div>
 
     <div class="takeaway green">
-      <div class="takeaway-icon">💹</div>
       <div>
         <div class="takeaway-title">Carrier Takeaway — Marketplace Scale</div>
         <div class="takeaway-body">Every vehicle you consign enters a global auction with 750,000+ potential bidders. A German dealer, a West African exporter, and a US dismantler all compete simultaneously — that competition is what maximises your salvage recovery. Copart's 97% sell-through rate means your vehicle doesn't sit, it sells.</div>
@@ -474,7 +466,6 @@
     </div>
 
     <div class="takeaway purple">
-      <div class="takeaway-icon">⚡</div>
       <div>
         <div class="takeaway-title">Carrier Takeaway — Digital Scale</div>
         <div class="takeaway-body">A top-rated, widely-downloaded buyer app means faster bid activity, real-time price signals, and a platform buyers actually use. Faster digital engagement = faster auction close = faster cycle time = less daily depreciation on your claims portfolio. Every day a total loss sits unsold costs your claim economics money.</div>
@@ -520,7 +511,6 @@
     </div>
 
     <div class="takeaway gold">
-      <div class="takeaway-icon">🏦</div>
       <div>
         <div class="takeaway-title">Carrier Takeaway — CapEx &amp; Reliability</div>
         <div class="takeaway-body">High CapEx means continued expansion of the physical and digital infrastructure your claims depend on. Competitors with low CapEx are managing existing assets; Copart is building future capacity. In CAT event scenarios — when your volume surges 5–10× overnight — you need a partner who has already invested in the capacity to absorb it.</div>
@@ -559,7 +549,6 @@
     </div>
 
     <div class="takeaway" style="margin-top:26px;">
-      <div class="takeaway-icon">🎯</div>
       <div>
         <div class="takeaway-title">The Integrated Scale Advantage</div>
         <div class="takeaway-body">Physical-only players are bottlenecked by buyer depth. Digital-only players are bottlenecked by storage and logistics. Only integrated players can promise: your vehicle is picked up fast, stored safely, listed broadly, and sold at maximum value. That combination is what differentiates claim economics — not any single metric in isolation.</div>
@@ -642,16 +631,16 @@
   // PPT competitor colors — matches index-ppt.html
   const CO  = ['Copart','IAA','Manheim','OpenLane','ACV','CarMax','Carvana','eBay Motors'];
   const BG  = [
-    'rgba(6,53,152,0.85)',   // Copart — blue #063598
+    'rgba(38,98,217,0.85)',  // Copart — blue #2662D9
     'rgba(212,42,84,0.75)',  // IAA — rose #D42A54
     'rgba(241,113,24,0.78)', // Manheim — orange #F17118
     'rgba(0,121,112,0.78)',  // OpenLane — teal #007970
     'rgba(123,56,179,0.78)', // ACV — purple #7B38B3
-    'rgba(38,98,217,0.75)',  // CarMax — mid blue #2662D9
+    'rgba(8,145,178,0.78)',  // CarMax — teal #0891B2
     'rgba(76,168,48,0.78)',  // Carvana — green #4CA830
     'rgba(236,156,13,0.82)', // eBay Motors — amber #EC9C0D
   ];
-  const BD  = ['#063598','#D42A54','#F17118','#007970','#7B38B3','#2662D9','#4CA830','#EC9C0D'];
+  const BD  = ['#2662D9','#D42A54','#F17118','#007970','#7B38B3','#0891B2','#4CA830','#EC9C0D'];
 
   function mkBar(id, allData, yLabel, tooltipSuffix, dlFmt, showAll = false) {
     const idx  = showAll ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4];
@@ -669,7 +658,7 @@
         labels: lbls,
         datasets: [{
           data, backgroundColor: bgs, borderColor: bds,
-          borderWidth: 2, borderRadius: 5, borderSkipped: false
+          borderWidth: 2, borderRadius: 0, borderSkipped: false
         }]
       },
       options: {

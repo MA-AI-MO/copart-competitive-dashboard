@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Copart vs. The Market — Competitive Dashboard (PPT Style)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <style>
+    /* ═══════════════════════════════════════════════════════
+       COPART PPT DESIGN SYSTEM
+       Colors: #0F2757 navy · #063598 blue-800 · #2662D9 blue-600
+               #F17118 orange · #F4F5F6 bg · #E2E5E9 border
+       Font: Arial / system-ui
+    ═══════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #F4F5F6;
+      --surface:  #FFFFFF;
+      --surface2: #F4F5F6;
+      --border:   #E2E5E9;
+      --border2:  #C5CCD3;
+      --navy:     #0F2757;
+      --blue8:    #063598;
+      --blue6:    #2662D9;
+      --blue2:    #E1ECF9;
+      --orange:   #F17118;
+      --text:     #2F333C;
+      --text2:    #46525D;
+      --muted:    #7A8691;
+      --success:  #4CA830;
+      --error:    #D42A54;
+      /* Axis colors read by axisStyle() */
+      --axis-grid: rgba(203,213,225,0.55);
+      --axis-tick: #7A8691;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: Arial, 'Helvetica Neue', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--navy);
+      border-bottom: 4px solid var(--orange);
+    }
+    .hdr-top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 40px; border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .hdr-logo { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+    .hdr-logo-mark { width: 34px; height: 34px; background: var(--orange); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+    .hdr-logo-mark svg { width: 18px; height: 18px; fill: #fff; }
+    .hdr-brand { font-size: 0.9rem; font-weight: 700; color: #fff; letter-spacing: 0.2px; }
+    .hdr-controls { display: flex; align-items: center; gap: 8px; }
+    .ctrl-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 13px; border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.8); cursor: pointer;
+      font-family: Arial, sans-serif; font-size: 0.75rem; font-weight: 600;
+      transition: all 0.15s; text-decoration: none; letter-spacing: 0.2px;
+    }
+    .ctrl-btn:hover { background: rgba(255,255,255,0.14); color: #fff; border-color: rgba(255,255,255,0.35); }
+    .ctrl-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .hdr-body { padding: 30px 40px 34px; }
+    .hdr-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(241,113,24,0.15); border: 1px solid rgba(241,113,24,0.35);
+      color: #F17118; font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; padding: 4px 13px; border-radius: 100px; margin-bottom: 18px;
+    }
+    .hdr-pill span { width: 5px; height: 5px; border-radius: 50%; background: #F17118; }
+    header h1 {
+      font-size: clamp(1.85rem, 3.5vw, 2.9rem); font-weight: 900; letter-spacing: -1.2px;
+      line-height: 1.1; color: #fff; margin-bottom: 8px;
+    }
+    header h1 em { color: var(--orange); font-style: normal; }
+    .hdr-sub { font-size: 0.9rem; color: rgba(255,255,255,0.6); max-width: 560px; margin-bottom: 28px; line-height: 1.55; }
+    .stat-strip {
+      display: flex; gap: 0; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px;
+      overflow: hidden; width: fit-content;
+    }
+    .stat-item {
+      padding: 13px 26px; text-align: center;
+      border-right: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-val { font-size: 1.5rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+    .stat-lbl { font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.45); margin-top: 3px; }
+
+    /* ── LEGEND BAR ── */
+    .legend-bar {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 10px 40px; display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px; position: sticky; top: 0; z-index: 50;
+      box-shadow: 0 1px 4px rgba(15,39,87,0.06);
+    }
+    .filter-row { display: flex; align-items: center; gap: 8px; }
+    .filter-lbl { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+    .filter-btn {
+      padding: 4px 12px; border-radius: 100px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); font-family: Arial, sans-serif;
+      font-size: 0.7rem; font-weight: 600; cursor: pointer; transition: all 0.14s; letter-spacing: 0.2px;
+    }
+    .filter-btn.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .filter-btn:hover:not(.active) { border-color: var(--blue6); color: var(--blue6); }
+    .filter-hint { font-size: 0.66rem; color: var(--muted); }
+    .legend-items { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.73rem; color: var(--text2); font-weight: 500; }
+    .legend-item.hi { font-weight: 700; color: var(--navy); }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* ── MAIN ── */
+    main { padding: 0 40px 60px; max-width: 1440px; margin: 0 auto; }
+    .sec-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); padding: 26px 0 10px;
+      border-bottom: 1px solid var(--border); margin-bottom: 14px;
+    }
+    .g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
+    .g2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 14px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 18px 18px 12px; transition: box-shadow 0.15s;
+    }
+    .card:hover { box-shadow: 0 2px 10px rgba(15,39,87,0.08); }
+    .card-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 3px; }
+    .card-hd-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .card-title { font-size: 0.85rem; font-weight: 700; color: var(--navy); }
+    .card-sub { font-size: 0.67rem; color: var(--muted); margin-bottom: 12px; line-height: 1.45; }
+    .cw { position: relative; height: 220px; }
+    .max-btn {
+      background: none; border: none; cursor: pointer; padding: 2px;
+      color: var(--muted); transition: color 0.14s; flex-shrink: 0;
+    }
+    .max-btn:hover { color: var(--blue6); }
+    .max-btn svg { width: 13px; height: 13px; }
+    .ct-group { display: flex; gap: 2px; }
+    .ct-btn {
+      padding: 3px 5px; border-radius: 4px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); cursor: pointer; transition: all 0.12s;
+    }
+    .ct-btn.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .ct-btn:hover:not(.active) { border-color: var(--blue6); color: var(--blue6); }
+    .ct-btn svg { display: block; width: 12px; height: 11px; }
+    .src-btn {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 9px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+      padding: 2px 0; display: flex; align-items: center; gap: 4px;
+      transition: color 0.14s;
+    }
+    .src-btn:hover { color: var(--blue6); }
+    .src-btn svg { width: 11px; height: 11px; }
+
+    /* ── RADAR ── */
+    .radar-section {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 22px; margin-bottom: 14px;
+    }
+    .radar-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+    .radar-hd-text h2 { font-size: 1.05rem; font-weight: 800; color: var(--navy); }
+    .radar-hd-text p { font-size: 0.69rem; color: var(--muted); margin-top: 3px; }
+    .radar-metric-filter { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+    .rmf-btn {
+      padding: 3px 9px; border-radius: 100px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); font-family: Arial, sans-serif;
+      font-size: 0.67rem; font-weight: 600; cursor: pointer; transition: all 0.13s;
+    }
+    .rmf-btn.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .rmf-btn:hover:not(.on) { border-color: var(--blue6); color: var(--blue6); }
+    .rmf-reset {
+      padding: 3px 9px; border-radius: 100px; border: 1px solid var(--border2);
+      background: transparent; color: var(--text2); font-family: Arial, sans-serif;
+      font-size: 0.67rem; font-weight: 600; cursor: pointer; transition: all 0.13s;
+    }
+    .rmf-reset:hover { background: var(--border); }
+    .radar-wrap { height: 480px; }
+
+    /* ── BUBBLE ── */
+    .bubble-section {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 22px; margin-bottom: 14px;
+    }
+    .bubble-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+    .bubble-hd-text h2 { font-size: 1.05rem; font-weight: 800; color: var(--navy); }
+    .bubble-hd-text p { font-size: 0.69rem; color: var(--muted); margin-top: 3px; }
+    .bubble-controls { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 10px; }
+    .bubble-btn {
+      padding: 5px 13px; border-radius: 100px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); font-family: Arial, sans-serif;
+      font-size: 0.7rem; font-weight: 600; cursor: pointer; transition: all 0.13s;
+    }
+    .bubble-btn.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .bubble-btn:hover:not(.active) { border-color: var(--blue6); color: var(--blue6); }
+    .bubble-wrap { height: 450px; }
+
+    /* ── WHERE COPART LEADS ── */
+    .dom-section { background: var(--navy); border-radius: 8px; padding: 30px 38px; margin-bottom: 14px; }
+    .dom-section h2 { font-size: 1.3rem; font-weight: 800; color: #fff; margin-bottom: 5px; }
+    .dom-section p { font-size: 0.83rem; color: rgba(255,255,255,0.55); margin-bottom: 22px; }
+    .dom-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 10px; }
+    .dom-card {
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.11);
+      border-radius: 8px; padding: 15px;
+    }
+    .dom-rank { font-size: 0.6rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--orange); margin-bottom: 5px; }
+    .dom-metric { font-size: 0.73rem; font-weight: 700; color: rgba(255,255,255,0.8); margin-bottom: 4px; }
+    .dom-value { font-size: 1.1rem; font-weight: 900; color: #fff; letter-spacing: -0.3px; }
+    .dom-ctx { font-size: 0.62rem; color: rgba(255,255,255,0.4); margin-top: 3px; line-height: 1.4; }
+
+    /* ── DOWNLOAD MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(15,39,87,0.45); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      width: 460px; max-width: 95vw; overflow: hidden;
+      box-shadow: 0 8px 32px rgba(15,39,87,0.14);
+    }
+    .modal-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 15px 20px; border-bottom: 1px solid var(--border);
+    }
+    .modal-hdr h3 { font-size: 0.95rem; font-weight: 700; color: var(--navy); }
+    .modal-close { background: none; border: none; font-size: 1.05rem; color: var(--muted); cursor: pointer; transition: color 0.14s; }
+    .modal-close:hover { color: var(--text); }
+    .modal-body { padding: 10px 8px; max-height: 420px; overflow-y: auto; }
+    .dl-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 6px; }
+    .dl-row:hover { background: var(--bg); }
+    .dl-lbl { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+    .dl-btns { display: flex; gap: 6px; }
+    .dl-btn {
+      padding: 4px 11px; border-radius: 5px; border: 1px solid var(--blue6);
+      background: transparent; color: var(--blue6); font-family: Arial, sans-serif;
+      font-size: 0.68rem; font-weight: 700; cursor: pointer; transition: all 0.13s;
+    }
+    .dl-btn:hover { background: var(--blue6); color: #fff; }
+
+    /* ── SOURCE POPOVER ── */
+    .src-pop {
+      display: none; position: fixed; bottom: 20px; right: 20px; z-index: 300;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; width: 360px; max-width: 95vw;
+      box-shadow: 0 8px 32px rgba(15,39,87,0.12);
+    }
+    .src-pop.open { display: block; }
+    .src-pop-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+    }
+    .src-pop-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--navy); }
+    .src-pop-close { background: none; border: none; font-size: 1rem; color: var(--muted); cursor: pointer; }
+    .src-pop-list { list-style: none; padding: 8px 16px 14px; max-height: 280px; overflow-y: auto; }
+    .src-pop-list li { padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 0.73rem; color: var(--text2); }
+    .src-pop-list li:last-child { border-bottom: none; }
+    .src-pop-list a { color: var(--blue6); text-decoration: none; }
+    .src-pop-list a:hover { text-decoration: underline; }
+
+    /* ── MAXIMIZE MODAL ── */
+    .max-overlay {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: rgba(15,39,87,0.55); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center;
+    }
+    .max-overlay.open { display: flex; }
+    .max-box {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      width: min(1100px, 96vw); max-height: 90vh; overflow: hidden;
+      display: flex; flex-direction: column;
+      box-shadow: 0 12px 48px rgba(15,39,87,0.18);
+    }
+    .max-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+    }
+    .max-hd-text { display: flex; flex-direction: column; gap: 3px; }
+    .max-title { font-size: 0.95rem; font-weight: 700; color: var(--navy); }
+    .max-sub { font-size: 0.69rem; color: var(--muted); }
+    .max-body { flex: 1; overflow: hidden; padding: 18px; }
+    .max-cw { height: 100%; min-height: 400px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--surface); border-top: 1px solid var(--border);
+      padding: 22px 40px; font-size: 0.68rem; color: var(--muted); line-height: 1.75;
+    }
+    footer a { color: var(--blue6); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 960px) { .g3 { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 640px) {
+      .g3, .g2 { grid-template-columns: 1fr; }
+      main, .hdr-top, .hdr-body, .legend-bar, footer { padding-left: 18px; padding-right: 18px; }
+      .legend-items { display: none; }
+      .stat-strip { flex-direction: column; width: 100%; }
+      .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="hdr-top">
+    <a class="hdr-logo" href="index.html">
+      <div class="hdr-logo-mark">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <span class="hdr-brand">Copart Competitive Intelligence</span>
+    </a>
+    <div class="hdr-controls">
+      <a class="ctrl-btn" href="story-ppt.html" style="text-decoration:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span>Insurance Story</span>
+      </a>
+      <a class="ctrl-btn" href="index.html" style="text-decoration:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <span>Dark Mode Version</span>
+      </a>
+      <button class="ctrl-btn" onclick="openDownloadModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Download Data</span>
+      </button>
+    </div>
+  </div>
+  <div class="hdr-body">
+    <div class="hdr-pill"><span></span>Competitive Intelligence · FY2024–25</div>
+    <h1><em>Copart</em> vs. <strong>The Market</strong></h1>
+    <p class="hdr-sub">19 benchmarks across 8 competitors — scale, technology, buyer network, and digital presence. All 2024 data.</p>
+    <div class="stat-strip">
+      <div class="stat-item"><div class="stat-val">$54B</div><div class="stat-lbl">Market Cap</div></div>
+      <div class="stat-item"><div class="stat-val">260+</div><div class="stat-lbl">Locations</div></div>
+      <div class="stat-item"><div class="stat-val">120K</div><div class="stat-lbl">Acres</div></div>
+      <div class="stat-item"><div class="stat-val">11</div><div class="stat-lbl">Countries</div></div>
+      <div class="stat-item"><div class="stat-val">170+</div><div class="stat-lbl">Buyer Countries</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ LEGEND + FILTER ══ -->
+<div class="legend-bar">
+  <div class="filter-row">
+    <span class="filter-lbl">Competitors:</span>
+    <button class="filter-btn active" data-f="all" onclick="applyFilter('all')">All</button>
+    <button class="filter-btn" data-f="primary" onclick="applyFilter('primary')" title="IAA, Manheim, OpenLane, ACV">Primary</button>
+    <button class="filter-btn" data-f="secondary" onclick="applyFilter('secondary')" title="CarMax, Carvana, eBay Motors">Secondary</button>
+    <span class="filter-hint" id="filterHint">IAA · Manheim · OpenLane · ACV are Primary &nbsp;|&nbsp; CarMax · Carvana · eBay Motors are Secondary</span>
+  </div>
+  <div class="legend-items">
+    <div class="legend-item hi"><div class="legend-dot" style="background:#063598"></div>Copart</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#D42A54"></div>IAA (RB Global)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#F17118"></div>Manheim</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#007970"></div>OpenLane</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7B38B3"></div>ACV Auctions</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2662D9"></div>CarMax</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#4CA830"></div>Carvana</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#EC9C0D"></div>eBay Motors</div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<main>
+
+  <!-- 01 FINANCIAL -->
+  <div class="sec-label">01 — Financial &amp; Market Scale</div>
+  <div class="g3">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Annual Revenue</div>
+        <button class="max-btn" onclick="openMax('revenueChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Most recent fiscal year, USD billions. CarMax &amp; Carvana include retail sales. eBay Motors is an estimated contribution.</div>
+      <div class="cw"><canvas id="revenueChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Market Capitalization</div>
+        <button class="max-btn" onclick="openMax('mktCapChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Public market value, USD billions · year-end 2024. Manheim (private) and eBay Motors (division) shown as N/A.</div>
+      <div class="cw"><canvas id="mktCapChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Capital Expenditure</div>
+        <button class="max-btn" onclick="openMax('capexChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Annual capex, USD billions · FY2024. Copart's high capex reflects its active land acquisition &amp; facility build-out program.</div>
+      <div class="cw"><canvas id="capexChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 02 PHYSICAL FOOTPRINT -->
+  <div class="sec-label">02 — Physical Footprint</div>
+  <div class="g3">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Physical Locations</div>
+        <button class="max-btn" onclick="openMax('locationsChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Auction yards, storage lots &amp; reconditioning centres · 2024. ACV &amp; eBay are digital-only.</div>
+      <div class="cw"><canvas id="locationsChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Land Footprint</div>
+        <button class="max-btn" onclick="openMax('acreageChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Total owned &amp; operated acreage (thousands) · 2024.</div>
+      <div class="cw"><canvas id="acreageChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Countries of Operation</div>
+        <button class="max-btn" onclick="openMax('countriesChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Countries with active physical or digital operations · 2024.</div>
+      <div class="cw"><canvas id="countriesChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 03 OPERATIONAL -->
+  <div class="sec-label">03 — Operational Volume</div>
+  <div class="g3">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Vehicles Auctioned / Available</div>
+        <button class="max-btn" onclick="openMax('vehiclesAssignedChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Millions of vehicles consigned/assigned to auction per year · FY2024.</div>
+      <div class="cw"><canvas id="vehiclesAssignedChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Vehicles Sold Annually</div>
+        <button class="max-btn" onclick="openMax('vehiclesSoldChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Millions of vehicles actually sold at auction · FY2024.</div>
+      <div class="cw"><canvas id="vehiclesSoldChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Average Daily Inventory</div>
+        <button class="max-btn" onclick="openMax('inventoryChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Vehicles available for bidding on any given day (thousands) · 2024.</div>
+      <div class="cw"><canvas id="inventoryChart"></canvas></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Towing &amp; Transporter Network</div>
+        <button class="max-btn" onclick="openMax('transportChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Contracted tow operators, transport carrier partners &amp; owned delivery fleets (thousands) · 2024.</div>
+      <div class="cw"><canvas id="transportChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Title Processing — All Channels</div>
+        <button class="max-btn" onclick="openMax('titleChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Annual title transfers processed or facilitated (millions) · FY2024.</div>
+      <div class="cw"><canvas id="titleChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 04 WORKFORCE -->
+  <div class="sec-label">04 — Workforce &amp; Culture</div>
+  <div class="g3">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Total Employees</div>
+        <button class="max-btn" onclick="openMax('employeesChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Full-time equivalent headcount (thousands) · 2024.</div>
+      <div class="cw"><canvas id="employeesChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Glassdoor Employee Rating</div>
+        <button class="max-btn" onclick="openMax('glassdoorChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Aggregate employee satisfaction · 2024. Out of 5.0.</div>
+      <div class="cw"><canvas id="glassdoorChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Years in Operation</div>
+        <button class="max-btn" onclick="openMax('yearsChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Years of continuous operation as of 2025.</div>
+      <div class="cw"><canvas id="yearsChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 05 MAIN APP -->
+  <div class="sec-label">05 — Main Platform App</div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Main App Rating (iOS)</div>
+        <button class="max-btn" onclick="openMax('appRatingChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">iOS App Store buyer/seller platform rating · 2024. Out of 5.0.</div>
+      <div class="cw"><canvas id="appRatingChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Main App Downloads</div>
+        <button class="max-btn" onclick="openMax('appDownloadsChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Combined iOS + Android total downloads (millions) · 2024.</div>
+      <div class="cw"><canvas id="appDownloadsChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 06 DRIVER APP -->
+  <div class="sec-label">06 — Driver / Transporter App</div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Driver App Rating (iOS)</div>
+        <button class="max-btn" onclick="openMax('driverRatingChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Dedicated driver/transport app iOS rating · 2024. N/A where no dedicated driver app exists.</div>
+      <div class="cw"><canvas id="driverRatingChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Driver App Downloads</div>
+        <button class="max-btn" onclick="openMax('driverDownloadsChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Driver/transport app combined iOS + Android downloads (millions) · 2024.</div>
+      <div class="cw"><canvas id="driverDownloadsChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 07 BUYER NETWORK -->
+  <div class="sec-label">07 — Buyer Network</div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Registered Global Buyers</div>
+        <button class="max-btn" onclick="openMax('buyersChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Total registered buyer/member accounts (thousands) · 2024.</div>
+      <div class="cw"><canvas id="buyersChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Buyer Countries</div>
+        <button class="max-btn" onclick="openMax('buyerCountriesChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Countries from which active buyers placed bids · 2024.</div>
+      <div class="cw"><canvas id="buyerCountriesChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 08 DIGITAL PRESENCE -->
+  <div class="sec-label">08 — Social Media &amp; Digital Presence</div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Monthly Social &amp; Web Mentions</div>
+        <button class="max-btn" onclick="openMax('socialChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Estimated average monthly brand mentions across social platforms, news &amp; forums (thousands) · 2024.</div>
+      <div class="cw"><canvas id="socialChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">B2B Auction Mentions (Excl. Retail)</div>
+        <button class="max-btn" onclick="openMax('socialB2bChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Same metric filtered to B2B/salvage-auction segment only.</div>
+      <div class="cw"><canvas id="socialB2bChart"></canvas></div>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">YouTube Channel Subscribers</div>
+        <button class="max-btn" onclick="openMax('youtubeChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Official YouTube channel subscribers (thousands) · 2024.</div>
+      <div class="cw"><canvas id="youtubeChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Monthly YouTube Mentions</div>
+        <button class="max-btn" onclick="openMax('youtubeMentionsChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Estimated monthly brand video mentions on YouTube (thousands) · 2024.</div>
+      <div class="cw"><canvas id="youtubeMentionsChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Estimated Monthly SEM Spend</div>
+        <button class="max-btn" onclick="openMax('semChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+      <div class="card-sub">Estimated paid search monthly spend, USD millions · 2024.</div>
+      <div class="cw"><canvas id="semChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- RADAR -->
+  <div class="sec-label">Overall Competitive Profile</div>
+  <div class="radar-section">
+    <div class="radar-hd">
+      <div class="radar-hd-text">
+        <h2 id="radarTitle">Web Chart — 8 Competitors · 11 Dimensions</h2>
+        <p>Normalized scores 0–10 per axis (10 = best-in-class). Toggle axes below.</p>
+      </div>
+      <button class="max-btn" onclick="openMax('radarChart')" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+    </div>
+    <div class="radar-metric-filter" id="radarMetricFilter"></div>
+    <div class="radar-wrap"><div class="cw"><canvas id="radarChart"></canvas></div></div>
+  </div>
+
+  <!-- BUBBLE CHART -->
+  <div class="sec-label">Multi-Dimension Comparison</div>
+  <div class="bubble-section">
+    <div class="bubble-hd">
+      <div class="bubble-hd-text">
+        <h2>Bubble Chart — Scale vs. Reach vs. Revenue</h2>
+        <p>Each bubble = one competitor. X = Physical Locations · Y = Registered Buyers · Bubble Size = Annual Revenue.</p>
+      </div>
+    </div>
+    <div class="bubble-controls" id="bubbleControls"></div>
+    <div class="bubble-wrap"><canvas id="bubbleChart"></canvas></div>
+  </div>
+
+  <!-- WHERE COPART LEADS -->
+  <div class="dom-section">
+    <h2>Where Copart Leads</h2>
+    <p>Every metric where Copart holds the #1 position across the full 8-competitor set.</p>
+    <div class="dom-grid">
+      <div class="dom-card"><div class="dom-rank">#1</div><div class="dom-metric">Market Cap</div><div class="dom-value">~$54 Billion</div><div class="dom-ctx">Largest dedicated vehicle auction platform</div></div>
+      <div class="dom-card"><div class="dom-rank">#1</div><div class="dom-metric">Physical Locations</div><div class="dom-value">260+ Sites</div><div class="dom-ctx">More yards than IAA (200) &amp; CarMax (246)</div></div>
+      <div class="dom-card"><div class="dom-rank">#1</div><div class="dom-metric">Land Footprint</div><div class="dom-value">120,000+ Acres</div><div class="dom-ctx">4× more than IAA; digital peers own zero</div></div>
+      <div class="dom-card"><div class="dom-rank">#1</div><div class="dom-metric">Daily Vehicle Inventory</div><div class="dom-value">~180,000 Units</div><div class="dom-ctx">Largest available vehicle pool each day</div></div>
+      <div class="dom-card"><div class="dom-rank">#1</div><div class="dom-metric">Registered Buyers</div><div class="dom-value">750,000+</div><div class="dom-ctx">50% more than IAA (500K)</div></div>
+      <div class="dom-card"><div class="dom-rank">#1</div><div class="dom-metric">Buyer Countries</div><div class="dom-value">170+ Countries</div><div class="dom-ctx">Widest B2B auction demand globally</div></div>
+      <div class="dom-card"><div class="dom-rank">#1</div><div class="dom-metric">B2B Auction Mentions</div><div class="dom-value">~45K / Month</div><div class="dom-ctx">Highest brand presence in B2B auction segment</div></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══ DOWNLOAD MODAL ══ -->
+<div class="modal-overlay" id="dlModal">
+  <div class="modal-box">
+    <div class="modal-hdr"><h3>Download Chart Data</h3><button class="modal-close" onclick="closeDownloadModal()">&#x2715;</button></div>
+    <div class="modal-body" id="dlList"></div>
+  </div>
+</div>
+
+<!-- ══ SOURCE POPOVER ══ -->
+<div class="src-pop" id="srcPop">
+  <div class="src-pop-hd"><span class="src-pop-label">Data Sources</span><button class="src-pop-close" onclick="closeSources()">&#x2715;</button></div>
+  <ul class="src-pop-list" id="srcPopList"></ul>
+</div>
+
+<!-- ══ MAXIMIZE MODAL ══ -->
+<div class="max-overlay" id="maxOverlay">
+  <div class="max-box">
+    <div class="max-hdr">
+      <div class="max-hd-text"><span class="max-title" id="maxTitle"></span><span class="max-sub" id="maxSub"></span></div>
+      <button class="modal-close" onclick="closeMax()">&#x2715;</button>
+    </div>
+    <div class="max-body"><div class="max-cw"><canvas id="maxCanvas"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <strong>2024–25 Data &amp; Notes —</strong>
+  All data is directional — intended for presentation use, not investment decisions.
+  <strong>Revenue:</strong> Public SEC filings / investor reports (most recent FY).
+  <strong>Market Cap:</strong> Year-end 2024 approximations.
+  <strong>App Downloads:</strong> Combined iOS + Android estimates · 2024.
+  <strong>Buyer Countries:</strong> Copart investor disclosures (750K+ members, 170+ countries); peer figures are industry estimates.
+  <strong>SEM Spend:</strong> Estimated monthly paid search spend · derived from industry benchmarks · 2024.
+</footer>
+
+<script>
+  Chart.register(ChartDataLabels);
+  Chart.defaults.font.family = 'Arial';
+
+  // PPT Design System — always-light, no toggle
+  const isLight = () => true;
+
+  const CO = ['Copart','IAA','Manheim','OpenLane','ACV','CarMax','Carvana','eBay Motors'];
+  // PPT-aligned competitor colors (from Copart design system color palette)
+  const BG = [
+    'rgba(6,53,152,0.85)',   // Copart — deep blue #063598
+    'rgba(212,42,84,0.75)',  // IAA — rose #D42A54
+    'rgba(241,113,24,0.78)', // Manheim — orange #F17118
+    'rgba(0,121,112,0.78)',  // OpenLane — teal #007970
+    'rgba(123,56,179,0.78)', // ACV — purple #7B38B3
+    'rgba(38,98,217,0.75)',  // CarMax — mid blue #2662D9
+    'rgba(76,168,48,0.78)',  // Carvana — green #4CA830
+    'rgba(236,156,13,0.82)', // eBay Motors — amber #EC9C0D
+  ];
+  const BD = ['#063598','#D42A54','#F17118','#007970','#7B38B3','#2662D9','#4CA830','#EC9C0D'];
+
+  const ALL_IDX       = [0,1,2,3,4,5,6,7];
+  const PRIMARY_IDX   = [0,1,2,3,4];
+  const SECONDARY_IDX = [0,5,6,7];
+  let filterIndices = [...ALL_IDX];
+
+  function axisStyle(forMax = false) {
+    return {
+      grid:   { color: 'rgba(203,213,225,0.55)' },
+      ticks:  { color: '#7A8691', font: { size: forMax ? 13 : 9 } },
+      border: { color: '#E2E5E9' },
+    };
+  }
+
+  const CR = {};
+  let maxChartInst = null;
+
+  function buildBarCfg(labels, rawData, bgColors, bdColors, tooltipUnit, yAxisLabel, dlFmt, yExtra, forMax = false) {
+    const effMin  = yExtra?.min ?? 0;
+    const dispData = rawData.map(v => v == null ? effMin : v);
+    const dispBg   = rawData.map((v, i) => v == null ? 'transparent' : bgColors[i]);
+    const dispBd   = rawData.map((v, i) => v == null ? 'transparent' : bdColors[i]);
+    const dispBw   = rawData.map(v => v == null ? 0 : 2);
+    const aStyle   = axisStyle(forMax);
+    return {
+      type: 'bar',
+      data: { labels, datasets: [{ data: dispData, _rawData: rawData, backgroundColor: dispBg, borderColor: dispBd, borderWidth: dispBw, borderRadius: 5, borderSkipped: false }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        layout: { padding: { top: 26, right: 6 } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0F2757', borderColor: '#E2E5E9', borderWidth: 1,
+            titleColor: '#fff', bodyColor: '#C5CCD3', padding: 11,
+            callbacks: { label: ctx => { const r = ctx.dataset._rawData?.[ctx.dataIndex]; return r == null ? '  N/A' : `  ${r} ${tooltipUnit}`; } }
+          },
+          datalabels: {
+            anchor: 'end', align: 'top', clip: false,
+            color: '#7A8691', font: { size: forMax ? 12 : 8.5, weight: '700' }, padding: { bottom: 2 },
+            formatter: (_val, ctx) => dlFmt(ctx.dataset._rawData?.[ctx.dataIndex]),
+          }
+        },
+        scales: {
+          x: { ...aStyle },
+          y: { ...aStyle, ...yExtra, title: { display: true, text: yAxisLabel, color: '#7A8691', font: { size: forMax ? 13 : 9.5, weight: '500' }, padding: { bottom: 6 } } }
+        },
+        animation: { duration: 700, easing: 'easeOutQuart' }
+      }
+    };
+  }
+
+  function mkBar(id, rawData, tooltipUnit, yAxisLabel, dlFmt, yExtra = {}) {
+    const fi   = filterIndices;
+    const fRaw = fi.map(i => rawData[i]);
+    const chart = new Chart(document.getElementById(id),
+      buildBarCfg(fi.map(i => CO[i]), fRaw, fi.map(i => BG[i]), fi.map(i => BD[i]), tooltipUnit, yAxisLabel, dlFmt, yExtra));
+    CR[id] = { chart, label: yAxisLabel, allData: rawData, tooltipUnit, dlFmt, yExtra, currentType: 'bar' };
+    return chart;
+  }
+
+  // ══ DATA ══
+  mkBar('revenueChart', [4.19,4.06,4.50,0.91,0.63,26.50,13.70,1.80], '$B', 'Revenue (USD Billions)', v => v==null?'':('$'+v+'B'));
+  mkBar('mktCapChart',  [54,8,null,1.1,1.4,11,49,null], '$B', 'Market Cap (USD Billions)', v => v==null?'N/A':('$'+v+'B'));
+  mkBar('capexChart',   [1.1,0.22,null,0.065,0.04,0.38,0.35,null], '$B', 'Capital Expenditure (USD Billions)', v => v==null?'N/A':('$'+v+'B'));
+  mkBar('locationsChart', [270,200,75,30,0,246,36,0], 'sites', 'Number of Locations', v => v==null?'':String(v));
+  mkBar('acreageChart',   [120,30,14,4,0,5,2,0], 'K acres', 'Land (Thousands of Acres)', v => v==null?'':v+'K');
+  mkBar('countriesChart', [11,2,4,3,2,1,1,15], 'countries', 'Countries of Operation', v => v==null?'':String(v));
+  mkBar('vehiclesAssignedChart', [3.6,2.4,10.0,1.6,0.6,0.95,0.45,3.0], 'M units', 'Vehicles Auctioned / Available (M / Year)', v => v==null?'':v+'M');
+  mkBar('vehiclesSoldChart',     [3.5,2.2,8.5,1.3,0.55,0.9,0.42,2.0],  'M units', 'Vehicles Sold (Millions / Year)', v => v==null?'':v+'M');
+  mkBar('inventoryChart',        [180,125,85,55,18,55,40,35], 'K vehicles', 'Daily Inventory (Thousands of Vehicles)', v => v==null?'':v+'K');
+  mkBar('transportChart', [20,10,4,0.5,1,1,2,null], 'K providers', 'Towing & Transport Network (Thousands)', v => v==null?'N/A':v+'K');
+  mkBar('titleChart',     [3.2,2.1,7.0,1.3,0.55,1.8,0.8,null], 'M titles/yr', 'Title Transfers Processed (Millions / Year)', v => v==null?'N/A':v+'M');
+  mkBar('employeesChart', [16,7,20,2.2,1.7,28,15,null], 'K people', 'Employees (Thousands)', v => v==null?'N/A':v+'K');
+  mkBar('glassdoorChart', [3.9,3.4,3.7,3.5,3.9,3.9,3.3,3.8], '/ 5.0', 'Glassdoor Rating (out of 5.0)', v => v==null?'':v.toFixed(1));
+  mkBar('yearsChart',     [42,43,79,35,10,31,12,25], 'years', 'Years in Operation', v => v==null?'':v+'yr');
+  mkBar('appRatingChart', [4.8,4.3,3.9,3.7,4.6,4.8,4.8,4.4], '/ 5.0', 'App Store Rating (out of 5.0)', v => v==null?'':v.toFixed(1));
+  mkBar('appDownloadsChart', [5,2,1,0.5,1,10,8,5], 'M downloads', 'App Downloads (Millions)', v => v==null?'':v+'M');
+  mkBar('driverRatingChart',    [4.5,4.0,3.8,null,4.2,4.3,4.5,null], '/ 5.0', 'Driver App Rating (out of 5.0)', v => v==null?'N/A':v.toFixed(1));
+  mkBar('driverDownloadsChart', [1.0,0.5,0.3,null,0.4,0.8,1.2,null], 'M downloads', 'Driver App Downloads (Millions)', v => v==null?'N/A':v+'M');
+  mkBar('buyersChart',       [750,500,70,85,25,null,null,null], 'K members', 'Registered Buyers (Thousands)', v => v==null?'N/A':v+'K');
+  mkBar('buyerCountriesChart',[170,40,25,20,3,1,1,65], 'countries', 'Countries with Active Buyers', v => v==null?'N/A':String(v));
+  mkBar('socialChart',    [45,25,35,8,12,180,280,55], 'K mentions/mo', 'Monthly Brand Mentions (Thousands)', v => v==null?'':v+'K');
+  mkBar('socialB2bChart', [45,25,35,8,12,null,null,null], 'K mentions/mo', 'B2B Auction Mentions (Thousands)', v => v==null?'N/A':v+'K');
+  mkBar('youtubeChart',        [90,20,25,7,4,115,60,47], 'K subscribers', 'YouTube Subscribers (Thousands)', v => v==null?'N/A':v+'K');
+  mkBar('youtubeMentionsChart',[8,4,6,1.5,2,95,120,18], 'K mentions/mo', 'Monthly YouTube Mentions (Thousands)', v => v==null?'N/A':v+'K');
+  mkBar('semChart', [1.1,0.6,0.75,0.35,0.45,11.5,15.0,5.0], '$M/month', 'Est. Monthly SEM Spend (USD Millions)', v => v==null?'N/A':('$'+v+'M'));
+
+  // ══ HORIZONTAL BAR CONFIG ══
+  function buildHBarCfg(labels, rawData, bgColors, bdColors, tooltipUnit, xAxisLabel, dlFmt, xExtra = {}, forMax = false) {
+    const effMin  = xExtra?.min ?? 0;
+    const dispData = rawData.map(v => v == null ? effMin : v);
+    const dispBg   = rawData.map((v, i) => v == null ? 'transparent' : bgColors[i]);
+    const dispBd   = rawData.map((v, i) => v == null ? 'transparent' : bdColors[i]);
+    const dispBw   = rawData.map(v => v == null ? 0 : 2);
+    const aStyle   = axisStyle(forMax);
+    return {
+      type: 'bar',
+      data: { labels, datasets: [{ data: dispData, _rawData: rawData, backgroundColor: dispBg, borderColor: dispBd, borderWidth: dispBw, borderRadius: 4, borderSkipped: false }] },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        layout: { padding: { top: 6, right: 68, bottom: 6, left: 4 } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0F2757', borderColor: '#E2E5E9', borderWidth: 1,
+            titleColor: '#fff', bodyColor: '#C5CCD3', padding: 11,
+            callbacks: { label: ctx => { const r = ctx.dataset._rawData?.[ctx.dataIndex]; return r==null?'  N/A':`  ${r} ${tooltipUnit}`; } }
+          },
+          datalabels: {
+            anchor: 'end', align: 'right', clip: false,
+            color: '#7A8691', font: { size: forMax ? 12 : 8.5, weight: '700' }, padding: { left: 5 },
+            formatter: (_v, ctx) => dlFmt(ctx.dataset._rawData?.[ctx.dataIndex]),
+          }
+        },
+        scales: {
+          x: { ...aStyle, ...xExtra, title: { display: true, text: xAxisLabel, color: '#7A8691', font: { size: forMax ? 13 : 9.5, weight: '500' }, padding: { top: 6 } } },
+          y: { ...aStyle }
+        },
+        animation: { duration: 600, easing: 'easeOutQuart' }
+      }
+    };
+  }
+
+  // ══ DOUGHNUT CONFIG ══
+  function buildDoughnutCfg(labels, rawData, bgColors, bdColors, tooltipUnit, _label, dlFmt, forMax = false) {
+    const valid = [];
+    rawData.forEach((v, i) => { if (v != null) valid.push({ v, label: labels[i], bg: bgColors[i], bd: bdColors[i] }); });
+    const total = valid.reduce((s, x) => s + x.v, 0);
+    return {
+      type: 'doughnut',
+      data: { labels: valid.map(x => x.label), datasets: [{ data: valid.map(x => x.v), backgroundColor: valid.map(x => x.bg), borderColor: valid.map(x => x.bd), borderWidth: 2, hoverOffset: 10 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        layout: { padding: 10 },
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              color: '#7A8691', font: { size: forMax ? 13 : 9.5, family: 'Arial' }, padding: forMax ? 14 : 11, boxWidth: forMax ? 13 : 10, boxHeight: forMax ? 13 : 10,
+              generateLabels: chart => chart.data.labels.map((lbl, i) => ({
+                text: `${lbl}  ${dlFmt(chart.data.datasets[0].data[i])}`,
+                fillStyle: chart.data.datasets[0].backgroundColor[i],
+                strokeStyle: chart.data.datasets[0].borderColor[i],
+                fontColor: '#7A8691', lineWidth: 1.5, hidden: !chart.getDataVisibility(i), index: i,
+              }))
+            }
+          },
+          tooltip: {
+            backgroundColor: '#0F2757', borderColor: '#E2E5E9', borderWidth: 1,
+            titleColor: '#fff', bodyColor: '#C5CCD3', padding: 11,
+            callbacks: { label: ctx => { const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0; return `  ${dlFmt(ctx.parsed)}  (${pct}%)`; } }
+          },
+          datalabels: {
+            display: ctx => total > 0 && (ctx.dataset.data[ctx.dataIndex] / total) > 0.06,
+            formatter: v => `${((v / total) * 100).toFixed(0)}%`,
+            color: '#fff', font: { size: forMax ? 13 : 9, weight: '700', family: 'Arial' },
+            textShadowBlur: 4, textShadowColor: 'rgba(0,0,0,0.35)',
+          }
+        },
+        animation: { duration: 600, easing: 'easeOutQuart' }
+      }
+    };
+  }
+
+  function buildForType(id, type, forMax = false) {
+    const { allData, label, tooltipUnit, dlFmt, yExtra } = CR[id];
+    const fi  = filterIndices;
+    const fRaw = fi.map(i => allData[i]);
+    const lbls = fi.map(i => CO[i]);
+    const bgs  = fi.map(i => BG[i]);
+    const bds  = fi.map(i => BD[i]);
+    if (type === 'hbar')     return buildHBarCfg(lbls, fRaw, bgs, bds, tooltipUnit, label, dlFmt, yExtra, forMax);
+    if (type === 'doughnut') return buildDoughnutCfg(lbls, fRaw, bgs, bds, tooltipUnit, label, dlFmt, forMax);
+    return buildBarCfg(lbls, fRaw, bgs, bds, tooltipUnit, label, dlFmt, yExtra, forMax);
+  }
+
+  function switchType(id, type, btn) {
+    const entry = CR[id];
+    entry.chart.destroy();
+    btn.closest('.ct-group').querySelectorAll('.ct-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    entry.currentType = type;
+    entry.chart = new Chart(document.getElementById(id), buildForType(id, type));
+  }
+
+  // ══ INJECT TYPE BUTTONS ══
+  const BAR_SVG   = `<svg viewBox="0 0 12 11" fill="currentColor"><rect x="0" y="3" width="3.5" height="8" rx="0.5"/><rect x="4.25" y="0" width="3.5" height="11" rx="0.5"/><rect x="8.5" y="5" width="3.5" height="6" rx="0.5"/></svg>`;
+  const HBAR_SVG  = `<svg viewBox="0 0 11 12" fill="currentColor"><rect x="0" y="0" width="11" height="3.5" rx="0.5"/><rect x="0" y="4.25" width="7" height="3.5" rx="0.5"/><rect x="0" y="8.5" width="9.5" height="3.5" rx="0.5"/></svg>`;
+  const DONUT_SVG = `<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="6" cy="6" r="4.5"/><circle cx="6" cy="6" r="1.6" stroke-width="1.5"/></svg>`;
+
+  function injectTypeButtons() {
+    Object.keys(CR).forEach(id => {
+      if (id === 'radarChart') return;
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      const cardHd = canvas.closest('.card')?.querySelector('.card-hd');
+      if (!cardHd) return;
+      const maxBtn = cardHd.querySelector('.max-btn');
+      if (!maxBtn) return;
+      const ctg = document.createElement('div');
+      ctg.className = 'ct-group';
+      ctg.innerHTML =
+        `<button class="ct-btn active" data-type="bar"      onclick="switchType('${id}','bar',this)"      title="Vertical bar">${BAR_SVG}</button>` +
+        `<button class="ct-btn"        data-type="hbar"     onclick="switchType('${id}','hbar',this)"     title="Horizontal bar">${HBAR_SVG}</button>` +
+        `<button class="ct-btn"        data-type="doughnut" onclick="switchType('${id}','doughnut',this)" title="Doughnut">${DONUT_SVG}</button>`;
+      const right = document.createElement('div');
+      right.className = 'card-hd-right';
+      cardHd.removeChild(maxBtn);
+      right.appendChild(ctg);
+      right.appendChild(maxBtn);
+      cardHd.appendChild(right);
+    });
+  }
+
+  // ══ RADAR ══
+  const norm = arr => {
+    const mx = Math.max(...arr.filter(v => v != null && v > 0));
+    return arr.map(v => (v == null || v === 0) ? 0 : parseFloat((v / mx * 10).toFixed(1)));
+  };
+
+  const ALL_RADAR_AXES_DEF = {
+    'Revenue':          norm([4.19,4.06,4.50,0.91,0.63,26.50,13.70,1.80]),
+    'Mkt Cap':          norm([54,8,0,1.1,1.4,11,49,0]),
+    'CapEx':            norm([1.1,0.22,0,0.065,0.04,0.38,0.35,0]),
+    'Locations':        norm([270,200,75,30,0,246,36,0]),
+    'Land Acreage':     norm([120,30,14,4,0,5,2,0]),
+    'Countries':        norm([11,2,4,3,2,1,1,15]),
+    'Veh. Auctioned':   norm([3.6,2.4,10.0,1.6,0.6,0.95,0.45,3.0]),
+    'Veh. Sold':        norm([3.5,2.2,8.5,1.3,0.55,0.90,0.42,2.0]),
+    'Daily Inventory':  norm([180,125,85,55,18,55,40,35]),
+    'Tow Network':      norm([20,10,4,0.5,1,1,2,0]),
+    'Title Processing': norm([3.2,2.1,7.0,1.3,0.55,1.8,0.8,0]),
+    'Employees':        norm([16,7,20,2.2,1.7,28,15,0]),
+    'Glassdoor':        norm([3.9,3.4,3.7,3.5,3.9,3.9,3.3,3.8]),
+    'Years in Op':      norm([42,43,79,35,10,31,12,25]),
+    'App Rating':       norm([4.8,4.3,3.9,3.7,4.6,4.8,4.8,4.4]),
+    'App Downloads':    norm([5,2,1,0.5,1,10,8,5]),
+    'Driver Rating':    norm([4.5,4.0,3.8,0,4.2,4.3,4.5,0]),
+    'Driver Downloads': norm([1.0,0.5,0.3,0,0.4,0.8,1.2,0]),
+    'Reg. Buyers':      norm([750,500,70,85,25,0,0,0]),
+    'Buyer Countries':  norm([170,40,25,20,3,1,1,65]),
+    'Social Mentions':  norm([45,25,35,8,12,180,280,55]),
+    'B2B Mentions':     norm([45,25,35,8,12,0,0,55]),
+    'YouTube Subs':     norm([90,20,25,7,4,115,60,47]),
+    'YT Mentions':      norm([8,4,6,1.5,2,95,120,18]),
+    'SEM Spend':        norm([1.1,0.6,0.75,0.35,0.45,11.5,15.0,5.0]),
+  };
+  const DEFAULT_RADAR_KEYS = new Set(['Mkt Cap','Locations','Land Acreage','Countries','Veh. Sold','App Rating','App Downloads','Glassdoor','Reg. Buyers','Buyer Countries','Social Mentions']);
+  let selectedRadarMetrics = new Set(DEFAULT_RADAR_KEYS);
+
+  function getActiveRadarAxes() {
+    const out = {};
+    for (const [k, v] of Object.entries(ALL_RADAR_AXES_DEF)) { if (selectedRadarMetrics.has(k)) out[k] = v; }
+    return out;
+  }
+
+  function buildRadarMetricFilter() {
+    const container = document.getElementById('radarMetricFilter');
+    container.innerHTML = '';
+    Object.keys(ALL_RADAR_AXES_DEF).forEach(key => {
+      const btn = document.createElement('button');
+      btn.className = 'rmf-btn' + (selectedRadarMetrics.has(key) ? ' on' : '');
+      btn.textContent = key;
+      btn.addEventListener('click', () => {
+        if (selectedRadarMetrics.has(key)) { if (selectedRadarMetrics.size <= 3) return; selectedRadarMetrics.delete(key); }
+        else { if (selectedRadarMetrics.size >= 14) return; selectedRadarMetrics.add(key); }
+        btn.classList.toggle('on', selectedRadarMetrics.has(key));
+        const n = selectedRadarMetrics.size;
+        document.getElementById('radarTitle').textContent = `Web Chart — 8 Competitors · ${n} Dimension${n !== 1 ? 's' : ''}`;
+        rebuildRadar();
+      });
+      container.appendChild(btn);
+    });
+    const reset = document.createElement('button');
+    reset.className = 'rmf-reset';
+    reset.textContent = '↺ Reset';
+    reset.addEventListener('click', () => {
+      selectedRadarMetrics = new Set(DEFAULT_RADAR_KEYS);
+      container.querySelectorAll('.rmf-btn').forEach(b => { b.classList.toggle('on', selectedRadarMetrics.has(b.textContent)); });
+      document.getElementById('radarTitle').textContent = `Web Chart — 8 Competitors · ${DEFAULT_RADAR_KEYS.size} Dimensions`;
+      rebuildRadar();
+    });
+    container.appendChild(reset);
+  }
+
+  function rebuildRadar() {
+    if (CR['radarChart']?.chart) {
+      CR['radarChart'].chart.destroy();
+      CR['radarChart'].chart = new Chart(document.getElementById('radarChart'), buildRadarCfg(filterIndices));
+    }
+  }
+
+  function buildRadarCfg(hiddenSet, forMax = false) {
+    const radarAxes = getActiveRadarAxes();
+    return {
+      type: 'radar',
+      data: {
+        labels: Object.keys(radarAxes),
+        datasets: CO.map((name, i) => ({
+          label: name,
+          data: Object.values(radarAxes).map(m => m[i]),
+          hidden: hiddenSet ? !hiddenSet.includes(i) : false,
+          backgroundColor: i === 0 ? 'rgba(6,53,152,0.15)' : BG[i].replace(/[\d.]+\)$/, '0.04)'),
+          borderColor: BD[i],
+          borderWidth: i === 0 ? 3 : 1.5,
+          pointBackgroundColor: BD[i],
+          pointRadius: i === 0 ? 5 : 3,
+          pointHoverRadius: 7,
+        }))
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#7A8691', font: { size: forMax ? 14 : 10.5, family: 'Arial' }, padding: forMax ? 18 : 14, boxWidth: forMax ? 14 : 11, boxHeight: forMax ? 14 : 11 } },
+          tooltip: { backgroundColor: '#0F2757', borderColor: '#E2E5E9', borderWidth: 1, titleColor: '#fff', bodyColor: '#C5CCD3' },
+          datalabels: { display: false }
+        },
+        scales: {
+          r: {
+            min: 0, max: 10,
+            grid:        { color: 'rgba(203,213,225,0.6)' },
+            angleLines:  { color: 'rgba(203,213,225,0.6)' },
+            pointLabels: { color: '#7A8691', font: { size: forMax ? 14 : 10, weight: '600' } },
+            ticks:       { display: false }
+          }
+        },
+        animation: { duration: 900 }
+      }
+    };
+  }
+
+  const radarChart = new Chart(document.getElementById('radarChart'), buildRadarCfg(filterIndices));
+  CR['radarChart'] = { chart: radarChart, label: 'Overall Competitive Profile (Radar)', allData: null, currentType: 'radar' };
+  buildRadarMetricFilter();
+
+  // ══ BUBBLE CHART ══
+  const BUBBLE_DIMS = [
+    { id: 'scale-reach', label: 'Scale vs. Reach vs. Revenue',      x: 'Locations',     y: 'Reg. Buyers',     r: 'Revenue' },
+    { id: 'phys-mkt',   label: 'Physical vs. Marketplace Depth',    x: 'Land Acreage',  y: 'Buyer Countries', r: 'Mkt Cap' },
+    { id: 'digital-vol',label: 'App Rating vs. Volume vs. CapEx',   x: 'App Rating',    y: 'Veh. Sold',       r: 'CapEx' },
+    { id: 'inv-buyers', label: 'Daily Inventory vs. Buyers vs. Revenue', x: 'Daily Inventory', y: 'Reg. Buyers', r: 'Revenue' },
+  ];
+  const BUBBLE_RAW = {
+    'Revenue':         [4.19,4.06,4.50,0.91,0.63,26.50,13.70,1.80],
+    'Mkt Cap':         [54,8,null,1.1,1.4,11,49,null],
+    'CapEx':           [1.1,0.22,null,0.065,0.04,0.38,0.35,null],
+    'Locations':       [270,200,75,30,0,246,36,0],
+    'Land Acreage':    [120,30,14,4,0,5,2,0],
+    'Veh. Sold':       [3.5,2.2,8.5,1.3,0.55,0.90,0.42,2.0],
+    'Daily Inventory': [180,125,85,55,18,55,40,35],
+    'App Rating':      [4.8,4.3,3.9,3.7,4.6,4.8,4.8,4.4],
+    'Reg. Buyers':     [750,500,70,85,25,null,null,null],
+    'Buyer Countries': [170,40,25,20,3,1,1,65],
+  };
+  const BUBBLE_UNITS = {
+    'Revenue':'$B','Mkt Cap':'$B','CapEx':'$B','Locations':'sites','Land Acreage':'K acres',
+    'Veh. Sold':'M/yr','Daily Inventory':'K vehicles','App Rating':'/ 5.0',
+    'Reg. Buyers':'K members','Buyer Countries':'countries',
+  };
+  const BUBBLE_ABBR = { 'Copart':'CPT','IAA':'IAA','Manheim':'MAN','OpenLane':'OL','ACV':'ACV','CarMax':'KMX','Carvana':'CVNA','eBay Motors':'eBay' };
+  const BUBBLE_MIN_R = 12, BUBBLE_MAX_R = 52;
+
+  let activeBubbleDim = 0;
+  let bubbleChartInst = null;
+
+  function buildBubbleCfg(dimIdx) {
+    const dim  = BUBBLE_DIMS[dimIdx];
+    const xArr = BUBBLE_RAW[dim.x], yArr = BUBBLE_RAW[dim.y], rArr = BUBBLE_RAW[dim.r];
+    const rMax = Math.max(...rArr.filter(v => v != null));
+    const datasets = CO.map((name, i) => {
+      const xv = xArr[i], yv = yArr[i], rv = rArr[i];
+      if (xv == null || yv == null || rv == null) return null;
+      const rPx = Math.round(BUBBLE_MIN_R + (BUBBLE_MAX_R - BUBBLE_MIN_R) * Math.sqrt(rv / rMax));
+      return { label: name, data: [{ x: xv, y: yv, r: rPx }], backgroundColor: BG[i], borderColor: BD[i], borderWidth: i === 0 ? 3 : 1.5, _rawR: rv, _rPx: rPx };
+    }).filter(Boolean);
+    const xVals = datasets.map(d => d.data[0].x);
+    const yVals = datasets.map(d => d.data[0].y);
+    const xMax  = Math.max(...xVals) * 1.20;
+    const yMax  = Math.max(...yVals) * 1.25;
+    return {
+      type: 'bubble', data: { datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        layout: { padding: { top: 30, right: 30, bottom: 10, left: 10 } },
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#7A8691', font: { size: 10.5, family: 'Arial' }, padding: 14, boxWidth: 11, boxHeight: 11 } },
+          tooltip: {
+            backgroundColor: '#0F2757', borderColor: '#E2E5E9', borderWidth: 1,
+            titleColor: '#fff', bodyColor: '#C5CCD3', padding: 12,
+            callbacks: {
+              title: ctx => ctx[0].dataset.label,
+              label: ctx => { const ds = ctx.dataset, pt = ctx.raw; return [`  ${dim.x}: ${pt.x} ${BUBBLE_UNITS[dim.x]}`,`  ${dim.y}: ${pt.y} ${BUBBLE_UNITS[dim.y]}`,`  ${dim.r}: ${ds._rawR} ${BUBBLE_UNITS[dim.r]}`]; }
+            }
+          },
+          datalabels: {
+            anchor: 'end', align: 'top', clip: false, offset: 4,
+            color: '#2F333C',
+            font: ctx => ({ size: ctx.dataset._rPx >= 28 ? 10 : 9, weight: '700', family: 'Arial' }),
+            formatter: (val, ctx) => BUBBLE_ABBR[ctx.dataset.label] || ctx.dataset.label,
+          }
+        },
+        scales: {
+          x: { min: 0, max: xMax, grid: { color: 'rgba(203,213,225,0.55)' }, ticks: { color: '#7A8691', font: { size: 9.5 } }, border: { color: '#E2E5E9' }, title: { display: true, text: `${dim.x} (${BUBBLE_UNITS[dim.x]})`, color: '#7A8691', font: { size: 9.5, weight: '500' } } },
+          y: { min: 0, max: yMax, grid: { color: 'rgba(203,213,225,0.55)' }, ticks: { color: '#7A8691', font: { size: 9.5 } }, border: { color: '#E2E5E9' }, title: { display: true, text: `${dim.y} (${BUBBLE_UNITS[dim.y]})`, color: '#7A8691', font: { size: 9.5, weight: '500' } } }
+        },
+        animation: { duration: 700, easing: 'easeOutQuart' }
+      }
+    };
+  }
+
+  function switchBubbleDim(idx, btn) {
+    document.querySelectorAll('.bubble-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeBubbleDim = idx;
+    if (bubbleChartInst) bubbleChartInst.destroy();
+    bubbleChartInst = new Chart(document.getElementById('bubbleChart'), buildBubbleCfg(idx));
+    document.querySelector('.bubble-hd-text p').textContent =
+      `Each bubble = one competitor. ${BUBBLE_DIMS[idx].x} (X-axis) · ${BUBBLE_DIMS[idx].y} (Y-axis) · Bubble Size = ${BUBBLE_DIMS[idx].r}.`;
+  }
+
+  function buildBubbleControls() {
+    const container = document.getElementById('bubbleControls');
+    BUBBLE_DIMS.forEach((dim, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'bubble-btn' + (i === 0 ? ' active' : '');
+      btn.textContent = dim.label;
+      btn.addEventListener('click', () => switchBubbleDim(i, btn));
+      container.appendChild(btn);
+    });
+  }
+  buildBubbleControls();
+  bubbleChartInst = new Chart(document.getElementById('bubbleChart'), buildBubbleCfg(0));
+
+  // ══ FILTER ══
+  function applyFilter(type) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.filter-btn[data-f="${type}"]`).classList.add('active');
+    if (type === 'primary')        filterIndices = [...PRIMARY_IDX];
+    else if (type === 'secondary') filterIndices = [...SECONDARY_IDX];
+    else                           filterIndices = [...ALL_IDX];
+    const hints = { all:'Showing all 8 competitors', primary:'Showing Copart + Primary (IAA · Manheim · OpenLane · ACV)', secondary:'Showing Copart + Secondary (CarMax · Carvana · eBay Motors)' };
+    document.getElementById('filterHint').textContent = hints[type];
+    Object.entries(CR).forEach(([id, entry]) => {
+      if (entry.currentType === 'radar') {
+        entry.chart.data.datasets.forEach((ds, di) => { ds.hidden = !filterIndices.includes(di); });
+        entry.chart.update();
+      } else {
+        entry.chart.destroy();
+        entry.chart = new Chart(document.getElementById(id), buildForType(id, entry.currentType || 'bar'));
+      }
+    });
+  }
+
+  // ══ MAXIMIZE ══
+  function openMax(id) {
+    const entry = CR[id];
+    const canvas = document.getElementById(id);
+    let title, sub;
+    if (id === 'radarChart') {
+      const hdText = canvas.closest('.radar-section')?.querySelector('.radar-hd-text');
+      title = hdText?.querySelector('h2')?.textContent || entry.label;
+      sub   = hdText?.querySelector('p')?.textContent  || '';
+    } else {
+      const card = canvas.closest('.card');
+      title = card?.querySelector('.card-title')?.textContent || entry.label;
+      sub   = card?.querySelector('.card-sub')?.textContent  || '';
+    }
+    document.getElementById('maxTitle').textContent = title;
+    const subEl = document.getElementById('maxSub');
+    subEl.textContent = sub;
+    subEl.style.display = sub ? '' : 'none';
+    document.getElementById('maxOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (maxChartInst) { maxChartInst.destroy(); maxChartInst = null; }
+    if (entry.currentType === 'radar') maxChartInst = new Chart(document.getElementById('maxCanvas'), buildRadarCfg(filterIndices, true));
+    else maxChartInst = new Chart(document.getElementById('maxCanvas'), buildForType(id, entry.currentType || 'bar', true));
+  }
+
+  function closeMax() {
+    document.getElementById('maxOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    if (maxChartInst) { maxChartInst.destroy(); maxChartInst = null; }
+  }
+  document.getElementById('maxOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeMax(); });
+
+  // ══ DOWNLOAD ══
+  function openDownloadModal() {
+    const list = document.getElementById('dlList');
+    list.innerHTML = Object.entries(CR).map(([id, { label, allData }]) => {
+      const hasCSV = allData !== null;
+      return `<div class="dl-row"><div class="dl-lbl">${label}</div><div class="dl-btns"><button class="dl-btn" onclick="dlPNG('${id}')">PNG</button>${hasCSV ? `<button class="dl-btn" onclick="dlCSV('${id}')">CSV</button>` : ''}</div></div>`;
+    }).join('');
+    document.getElementById('dlModal').classList.add('open');
+  }
+  function closeDownloadModal() { document.getElementById('dlModal').classList.remove('open'); }
+  document.getElementById('dlModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeDownloadModal(); });
+
+  function dlPNG(id) {
+    const { chart, label } = CR[id];
+    const src = chart.canvas;
+    const out = document.createElement('canvas');
+    out.width = src.width; out.height = src.height;
+    const ctx = out.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, out.width, out.height);
+    ctx.drawImage(src, 0, 0);
+    const a = document.createElement('a');
+    a.download = `copart-${id}.png`;
+    a.href = out.toDataURL('image/png');
+    a.click();
+  }
+
+  function dlCSV(id) {
+    const { allData, label } = CR[id];
+    if (!allData) return;
+    let csv = `Company,${label}\n`;
+    CO.forEach((c, i) => csv += `${c},${allData[i] == null ? 'N/A' : allData[i]}\n`);
+    const a = document.createElement('a');
+    a.download = `copart-${id}.csv`;
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    a.click();
+  }
+
+  injectTypeButtons();
+
+  // ══ SOURCE POPOVER (simplified) ══
+  const SRC_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+  let _activeSrcBtn = null;
+
+  function toggleSources(id, btn) {
+    const pop = document.getElementById('srcPop');
+    if (_activeSrcBtn === btn && pop.classList.contains('open')) { closeSources(); return; }
+    const list = document.getElementById('srcPopList');
+    list.innerHTML = '<li>See index.html data source annotations for full citation list.</li>';
+    pop.classList.add('open');
+    _activeSrcBtn = btn;
+    const rect = btn.getBoundingClientRect();
+    const popW = 360;
+    let left = rect.right - popW, top = rect.bottom + 8;
+    if (left < 8) left = 8;
+    if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
+    pop.style.left = `${left}px`; pop.style.top = `${top}px`;
+  }
+  function closeSources() { document.getElementById('srcPop').classList.remove('open'); _activeSrcBtn = null; }
+  document.addEventListener('click', e => {
+    const pop = document.getElementById('srcPop');
+    if (pop.classList.contains('open') && !pop.contains(e.target) && !e.target.closest('.src-btn')) closeSources();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeMax(); closeDownloadModal(); } });
+</script>
+</body>
+</html>
